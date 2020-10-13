@@ -3,7 +3,7 @@
   "short_name": "CovidItalia",
   "theme_color": "#fff",
   "background_color": "#fff",
-  "display": "standalone",
+  "display": "browser",
   "orientation": "portrait",
   "scope": "/coviditalia",
   "start_url": "/coviditalia",
