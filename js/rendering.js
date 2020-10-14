@@ -67,6 +67,47 @@ onChangeCheckboxAvg = function() {
     renderFromList(avgType)
 }
 
+let giorniData = 0
+setDateData = function() {
+
+    let dataAggiornamento = date.avg_1[date.avg_1.length - 1 - giorniData]
+    let infettiOggi = Number(datasets['nuovi_positivi'].avg_1[datasets['nuovi_positivi'].avg_1.length - 1 - giorniData]).toLocaleString()
+    let guaritiOggi = Number(datasets['dimessi_guariti'].avg_1[datasets['dimessi_guariti'].avg_1.length - 1 - giorniData]).toLocaleString()
+    let mortiOggi = Number(datasets['deceduti'].avg_1[datasets['deceduti'].avg_1.length - 1 - giorniData]).toLocaleString()
+    let tamponi = Number(datasets['tamponi'].avg_1[datasets['tamponi'].avg_1.length - 1 - giorniData]).toLocaleString()
+
+    $('#dataAggiornamento').text(dataAggiornamento)
+    $('#infettiOggi').text('Nuovi infetti: +' + infettiOggi)
+    $('#guaritiOggi').text('Nuovi guariti: +' + guaritiOggi)
+    $('#mortiOggi').text('Nuovi decessi: +' + mortiOggi)
+    $('#tamponiOggi').text('Nuovi tamponi effettuati: +' + tamponi)
+}
+
+previousDate = function() {
+    giorniData++
+    if (giorniData > date.avg_1.length - 1) {
+        giorniData--
+        return
+    }
+    setDateData()
+}
+nextDate = function() {
+    giorniData--
+    if (giorniData < 0) {
+        giorniData++
+        return
+    }
+    setDateData()
+}
+firstDate = function() {
+    giorniData = date.avg_1.length - 1
+    setDateData()
+}
+lastDate = function() {
+    giorniData = 0
+    setDateData()
+}
+
 let chart
 window.onload = function() {
     chart = new CanvasJS.Chart("chartContainer", {
@@ -87,6 +128,10 @@ window.onload = function() {
     });
 
     getData().then(() => {
+
+        let htmlData = $('#dataAggiornamento').html().replace('###DATA###', date.avg_1[date.avg_1.length - 1])
+
+        setDateData()
         addDataset('nuovi_positivi', 'avg_1')
     })
 }

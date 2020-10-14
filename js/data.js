@@ -55,11 +55,14 @@ let popolateData = function(dati_covid) {
     let totale_deceduti = dati_covid.map(a => a.deceduti)
     let totale_ospedalizzati = dati_covid.map(a => a.totale_ospedalizzati)
     let totale_tamponi = dati_covid.map(a => a.tamponi)
+    let totale_dimessi_guariti = dati_covid.map(a => a.dimessi_guariti)
     let deceduti = totaleToGiornaliero(totale_deceduti)
     let ospedalizzati = totaleToGiornaliero(totale_ospedalizzati)
     let tamponi = totaleToGiornaliero(totale_tamponi)
+    let dimessi_guariti = totaleToGiornaliero(totale_dimessi_guariti)
 
     let rateo_tamponi_nuovi_positivi = rateoListe(nuovi_positivi, tamponi)
+    let rateo_guariti_deceduti = rateoListe(dimessi_guariti, deceduti)
 
     datasets['nuovi_positivi'] = {
         title: 'Nuovi positivi',
@@ -105,6 +108,13 @@ let popolateData = function(dati_covid) {
         avg_3: listAvg(deceduti, 3),
         avg_7: listAvg(deceduti, 7),
     }
+    datasets['dimessi_guariti'] = {
+        title: 'Guariti',
+        id: 'dimessi_guariti',
+        avg_1: dimessi_guariti,
+        avg_3: listAvg(dimessi_guariti, 3),
+        avg_7: listAvg(dimessi_guariti, 7),
+    }
 
     datasets['rateo_tamponi_nuovi_positivi'] = {
         title: 'Rateo nuovi positivi per tampone',
@@ -112,6 +122,13 @@ let popolateData = function(dati_covid) {
         avg_1: rateo_tamponi_nuovi_positivi,
         avg_3: listAvg(rateo_tamponi_nuovi_positivi, 3),
         avg_7: listAvg(rateo_tamponi_nuovi_positivi, 7),
+    }
+    datasets['rateo_guariti_deceduti'] = {
+        title: 'Rateo guariti / deceduti',
+        id: 'rateo_guariti_deceduti',
+        avg_1: rateo_guariti_deceduti,
+        avg_3: rateoListe(datasets['dimessi_guariti'].avg_3, datasets['deceduti'].avg_3),
+        avg_7: rateoListe(datasets['dimessi_guariti'].avg_7, datasets['deceduti'].avg_7),
     }
 }
 

@@ -33,49 +33,71 @@
 </head>
 
 <body style="height: 100%;">
-    <div class="h1 text-center">Dati COVID 19 ITALIA</div>
-    <div class="row">
+    <div class="h1 text-center">Dati COVID-19 ITALIA</div>
+    <div class="h3 text-center">
+        <button type="button" class="btn btn-link btn-lg" onclick="firstDate()">&lt;--</button>
+        <button type="button" class="btn btn-link btn-lg" onclick="previousDate()">&lt;-</button> <span id="dataAggiornamento">
+            ###DATA###
+        </span>
+        <button type="button" class="btn btn-link btn-lg" onclick="nextDate()">-&gt;</button>
+        <button type="button" class="btn btn-link btn-lg" onclick="lastDate()">--&gt;</button>
+    </div>
+    <div class="h5 text-center" id="infettiOggi"></div>
+    <div class="h5 text-center" id="guaritiOggi"></div>
+    <div class="h5 text-center" id="mortiOggi"></div>
+    <div class="h5 text-center" id="tamponiOggi"></div>
+    <div class="row mt-5">
         <div class="col-md-3 offset-sm-2">
-            <label for="nuovi_positivi">Nuovi positivi</label>
             <input type="checkbox" id="nuovi_positivi" onchange="onChangeCheckbox('nuovi_positivi')" checked="true">
+            <label for="nuovi_positivi">Nuovi positivi</label>
             <br>
 
-            <label for="ricoverati_con_sintomi">Ricoverati con sintomi</label>
             <input type="checkbox" id="ricoverati_con_sintomi" onchange="onChangeCheckbox('ricoverati_con_sintomi')">
+            <label for="ricoverati_con_sintomi">Ricoverati con sintomi</label>
             <br>
 
-            <label for="terapia_intensiva">Terapia intensiva</label>
             <input type="checkbox" id="terapia_intensiva" onchange="onChangeCheckbox('terapia_intensiva')">
+            <label for="terapia_intensiva">Terapia intensiva</label>
             <br>
 
-            <label for="ospedalizzati">Ospedalizzati</label>
             <input type="checkbox" id="ospedalizzati" onchange="onChangeCheckbox('ospedalizzati')">
+            <label for="ospedalizzati">Ospedalizzati</label>
+            <br>
+
+            <input type="checkbox" id="deceduti" onchange="onChangeCheckbox('deceduti')">
+            <label for="deceduti">Deceduti</label>
             <br>
         </div>
         <div class="col-md-4">
 
-            <label for="deceduti">Deceduti</label>
-            <input type="checkbox" id="deceduti" onchange="onChangeCheckbox('deceduti')">
-            <br>
 
-            <label for="tamponi">Tamponi</label>
             <input type="checkbox" id="tamponi" onchange="onChangeCheckbox('tamponi')">
+            <label for="tamponi">Tamponi</label>
             <br>
 
-            <label for="rateo_tamponi_nuovi_positivi">Rateo nuovi positivi per tampone</label>
+            <input type="checkbox" id="dimessi_guariti" onchange="onChangeCheckbox('dimessi_guariti')">
+            <label for="dimessi_guariti">Guariti</label>
+            <br>
+
             <input type="checkbox" id="rateo_tamponi_nuovi_positivi" onchange="onChangeCheckbox('rateo_tamponi_nuovi_positivi')">
+            <label for="rateo_tamponi_nuovi_positivi">Rateo nuovi positivi per tampone</label>
+            <br>
+
+            <input type="checkbox" id="rateo_guariti_deceduti" onchange="onChangeCheckbox('rateo_guariti_deceduti')">
+            <label for="rateo_guariti_deceduti">Rateo guariti / deceduti</label>
+            <br>
         </div>
         <div class="col-md-3">
-            <label for="avg_1">Avg 1</label>
             <input type="radio" id="avg_1" value="avg_1" name="avg" onchange="onChangeCheckboxAvg()" checked="true">
+            <label for="avg_1">Avg 1</label>
             <br>
 
-            <label for="avg_3">Avg 3</label>
             <input type="radio" id="avg_3" value="avg_3" name="avg" onchange="onChangeCheckboxAvg()">
+            <label for="avg_3">Avg 3</label>
             <br>
 
-            <label for="avg_7">Avg 7</label>
             <input type="radio" id="avg_7" value="avg_1" name="avg" onchange="onChangeCheckboxAvg()">
+            <label for="avg_7">Avg 7</label>
             <br>
         </div>
     </div>
