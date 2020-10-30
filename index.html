@@ -5,28 +5,33 @@
 
     <title>Covid Italia</title>
 
-    <link rel="icon" href="./images/icons/icon-512x512.png">
+    <link rel="icon" href="./img/icons/icon-512x512.png">
 
     <link rel="manifest" href="manifest.json" />
     <!-- ios support -->
-    <link rel="apple-touch-icon" href="images/icons/icon-72x72.png" />
-    <link rel="apple-touch-icon" href="images/icons/icon-96x96.png" />
-    <link rel="apple-touch-icon" href="images/icons/icon-128x128.png" />
-    <link rel="apple-touch-icon" href="images/icons/icon-144x144.png" />
-    <link rel="apple-touch-icon" href="images/icons/icon-152x152.png" />
-    <link rel="apple-touch-icon" href="images/icons/icon-192x192.png" />
-    <link rel="apple-touch-icon" href="images/icons/icon-384x384.png" />
-    <link rel="apple-touch-icon" href="images/icons/icon-512x512.png" />
+    <link rel="apple-touch-icon" href="img/icons/icon-72x72.png" />
+    <link rel="apple-touch-icon" href="img/icons/icon-96x96.png" />
+    <link rel="apple-touch-icon" href="img/icons/icon-128x128.png" />
+    <link rel="apple-touch-icon" href="img/icons/icon-144x144.png" />
+    <link rel="apple-touch-icon" href="img/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" href="img/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" href="img/icons/icon-384x384.png" />
+    <link rel="apple-touch-icon" href="img/icons/icon-512x512.png" />
     <meta name="apple-mobile-web-app-status-bar" content="#db4938" />
     <meta name="theme-color" content="#db4938" />
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="./css/multi-select.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js" integrity="sha512-LGXaggshOkD/at6PFNcp2V2unf9LzFq6LE+sChH7ceMTDP0g2kn6Vxwgg7wkPP7AAtX+lmPqPdxB47A0Nz0cMQ==" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.quicksearch/2.4.0/jquery.quicksearch.min.js" integrity="sha512-EftvELo+CRsl6dER2p2FfP6JnueIg2g4i9zz3P42S5eTrtMLybcJ7D4+Sk9BlztI6sGutndC2vx2Pd4FcjgDhQ==" crossorigin="anonymous"></script>
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script src="./js/lib/jquery.multi-select.js"></script>
+    <script src="./js/lib/localeDateFormat.js"></script>
     <script src="./js/data.js"></script>
     <script src="./js/rendering.js"></script>
 
@@ -46,8 +51,8 @@
     <div class="h5 text-center" id="guaritiOggi"></div>
     <div class="h5 text-center" id="mortiOggi"></div>
     <div class="h5 text-center" id="tamponiOggi"></div>
-    <div class="row mt-5">
-        <div class="col-md-3 offset-sm-2">
+    <div class="row mt-5" style=" font-size: 18px;">
+        <div class="col-md-2 offset-md-1">
             <input type="checkbox" id="nuovi_positivi" onchange="onChangeCheckbox('nuovi_positivi')" checked="true">
             <label for="nuovi_positivi">Nuovi positivi</label>
             <br>
@@ -68,8 +73,7 @@
             <label for="deceduti">Deceduti</label>
             <br>
         </div>
-        <div class="col-md-4">
-
+        <div class="col-md-3">
 
             <input type="checkbox" id="tamponi" onchange="onChangeCheckbox('tamponi')">
             <label for="tamponi">Tamponi</label>
@@ -80,14 +84,11 @@
             <br>
 
             <input type="checkbox" id="rateo_tamponi_nuovi_positivi" onchange="onChangeCheckbox('rateo_tamponi_nuovi_positivi')">
-            <label for="rateo_tamponi_nuovi_positivi">Rateo nuovi positivi per tampone</label>
+            <label for="rateo_tamponi_nuovi_positivi">Nuovi positivi per mille tamponi</label>
             <br>
 
-            <input type="checkbox" id="rateo_guariti_deceduti" onchange="onChangeCheckbox('rateo_guariti_deceduti')">
-            <label for="rateo_guariti_deceduti">Rateo guariti / deceduti</label>
-            <br>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-1">
             <input type="radio" id="avg_1" value="avg_1" name="avg" onchange="onChangeCheckboxAvg()" checked="true">
             <label for="avg_1">Avg 1</label>
             <br>
@@ -99,6 +100,38 @@
             <input type="radio" id="avg_7" value="avg_1" name="avg" onchange="onChangeCheckboxAvg()">
             <label for="avg_7">Avg 7</label>
             <br>
+        </div>
+        <div class="col-md-2">
+
+            <input type="radio" id="allDate" value="allDate" name="dates" onchange="rangeMonth = 1000; renderFromList()" checked="true">
+            <label for="allDate">Tutte le date</label>
+            <br>
+
+            <input type="radio" id="last8month" value="last8month" name="dates" onchange="rangeMonth = 8; renderFromList()">
+            <label for="last8month">8 mesi</label>
+            <br>
+
+            <input type="radio" id="last6month" value="last6month" name="dates" onchange="rangeMonth = 6; renderFromList()">
+            <label for="last6month">6 mesi</label>
+            <br>
+
+            <input type="radio" id="last4month" value="last4month" name="dates" onchange="rangeMonth = 4; renderFromList()">
+            <label for="last4month">4 mesi</label>
+            <br>
+
+            <input type="radio" id="last2month" value="last2month" name="dates" onchange="rangeMonth = 2; renderFromList()">
+            <label for="last2month">2 mesi</label>
+            <br>
+
+            <input type="radio" id="last1month" value="last1month" name="dates" onchange="rangeMonth = 1; renderFromList()">
+            <label for="last1month">1 mese</label>
+            <br>
+        </div>
+        <div class="col-md-2">
+            <label for="regioni">Regioni</label>
+            <select name="regioni" id="regioni" onchange="renderFromList()">
+                <option value="" selected>Tutte</option>
+            </select>
         </div>
     </div>
 

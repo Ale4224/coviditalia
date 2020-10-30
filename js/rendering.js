@@ -12,9 +12,17 @@ const colorScheme = [
 
 let listEnabled = []
 
-generateDataPoints = function(list, date) {
+let rangeMonth = 1000
+let avgType = 'avg_1'
+
+let generateDataPoints = function(list, date) {
     let l = []
+
+    let dateRange = moment().subtract(rangeMonth, 'months')
+
     for (i in list) {
+        if (moment(date[i], getLocaleDateString()) < dateRange)
+            continue
         l.push({
             y: list[i],
             label: date[i],
@@ -23,52 +31,54 @@ generateDataPoints = function(list, date) {
     return l
 }
 
-renderFromList = function(avgType) {
+let renderFromList = function() {
     chart.options.axisY = []
     chart.options.data = []
-    for (i in listEnabled) {
-        id = listEnabled[i]
-        chart.options.axisY.push({
-            title: datasets[id].title,
-            titleFontSize: 20,
-            labelFontSize: 15,
-        })
-        chart.options.data.push({
-            type: "line",
-            name: datasets[id].title,
-            showInLegend: true,
-            axisYIndex: i,
-            dataPoints: generateDataPoints(datasets[id][avgType], date[avgType]),
-        })
+
+    for (let i in listEnabled) {
+        for (let regione of regioniSelezionate) {
+            id = listEnabled[i] + regione
+            chart.options.axisY.push({
+                title: datasets[id].title,
+                titleFontSize: 20,
+                labelFontSize: 15,
+            })
+            chart.options.data.push({
+                type: "line",
+                name: datasets[id].title,
+                showInLegend: true,
+                axisYIndex: i,
+                dataPoints: generateDataPoints(datasets[id][avgType], date[avgType]),
+            })
+        }
     }
     chart.render();
 }
 
-addDataset = function(id, avgType) {
+let addDataset = function(id) {
     listEnabled.push(id)
-    renderFromList(avgType)
+    renderFromList()
 }
-removeDataset = function(id, avgType) {
+let removeDataset = function(id) {
     listEnabled = listEnabled.filter(x => x != id)
-    renderFromList(avgType)
+    renderFromList()
 }
 
-onChangeCheckbox = function(id) {
-    avgType = [].slice.call(document.getElementsByName('avg'), 0).filter(x => x.checked)[0].id
+let onChangeCheckbox = function(id) {
     if (document.getElementById(id).checked) {
-        addDataset(id, avgType)
+        addDataset(id)
     } else {
-        removeDataset(id, avgType)
+        removeDataset(id)
     }
 }
 
-onChangeCheckboxAvg = function() {
-    let avgType = [].slice.call(document.getElementsByName('avg'), 0).filter(x => x.checked)[0].id
-    renderFromList(avgType)
+let onChangeCheckboxAvg = function() {
+    avgType = [].slice.call(document.getElementsByName('avg'), 0).filter(x => x.checked)[0].id
+    renderFromList()
 }
 
 let giorniData = 0
-setDateData = function() {
+let setDateData = function() {
 
     let dataAggiornamento = date.avg_1[date.avg_1.length - 1 - giorniData]
     let infettiOggi = Number(datasets['nuovi_positivi'].avg_1[datasets['nuovi_positivi'].avg_1.length - 1 - giorniData]).toLocaleString()
@@ -83,7 +93,7 @@ setDateData = function() {
     $('#tamponiOggi').text('Nuovi tamponi effettuati: +' + tamponi)
 }
 
-previousDate = function() {
+let previousDate = function() {
     giorniData++
     if (giorniData > date.avg_1.length - 1) {
         giorniData--
@@ -91,7 +101,7 @@ previousDate = function() {
     }
     setDateData()
 }
-nextDate = function() {
+let nextDate = function() {
     giorniData--
     if (giorniData < 0) {
         giorniData++
@@ -99,13 +109,25 @@ nextDate = function() {
     }
     setDateData()
 }
-firstDate = function() {
+let firstDate = function() {
     giorniData = date.avg_1.length - 1
     setDateData()
 }
-lastDate = function() {
+let lastDate = function() {
     giorniData = 0
     setDateData()
+}
+
+let multiSelectConfig = {
+    keepOrder: true,
+    afterSelect: function(value) {
+        regioniSelezionate.push(value[0])
+        renderFromList()
+    },
+    afterDeselect: function(value) {
+        regioniSelezionate = regioniSelezionate.filter(e => e != value[0])
+        renderFromList()
+    },
 }
 
 let chart
@@ -127,11 +149,15 @@ window.onload = function() {
         data: [],
     });
 
+    regioni.forEach(element => {
+        $('#regioni').append(new Option(element, element));
+    })
+    $('#regioni').multiSelect(multiSelectConfig)
+
     getData().then(() => {
-
-        let htmlData = $('#dataAggiornamento').html().replace('###DATA###', date.avg_1[date.avg_1.length - 1])
-
         setDateData()
-        addDataset('nuovi_positivi', 'avg_1')
+        addDataset('nuovi_positivi')
     })
 }
+
+let regioniSelezionate = [''];
