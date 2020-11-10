@@ -58,9 +58,9 @@ let popolateData = function(dati_covid, regione) {
 
     if (regione == '')
         date = {
-            avg_1: dati_covid.map(a => new Date(a.data).toLocaleDateString()),
-            avg_3: dati_covid.map(a => new Date(a.data).toLocaleDateString()).filter((a, index) => index % 3 == 0),
-            avg_7: dati_covid.map(a => new Date(a.data).toLocaleDateString()).filter((a, index) => index % 7 == 0),
+            avg_1: dati_covid.map(a => new Date(a.data)),
+            avg_3: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 3 == 0),
+            avg_7: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 7 == 0),
         }
 
     let nuovi_positivi = dati_covid.map(a => a.nuovi_positivi)

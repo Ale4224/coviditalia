@@ -19,13 +19,13 @@ let generateDataPoints = function(list, date) {
     let l = []
 
     let dateRange = moment().subtract(rangeMonth, 'months')
-
     for (i in list) {
-        if (moment(date[i], getLocaleDateString()) < dateRange)
+        if (moment(date[i]) < dateRange)
             continue
+
         l.push({
             y: list[i],
-            label: date[i],
+            label: date[i].toLocaleDateString(),
         })
     }
     return l
