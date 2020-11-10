@@ -81,12 +81,12 @@ let giorniData = 0
 let setDateData = function() {
 
     let dataAggiornamento = date.avg_1[date.avg_1.length - 1 - giorniData]
-    let infettiOggi = Number(datasets['nuovi_positivi'].avg_1[datasets['nuovi_positivi'].avg_1.length - 1 - giorniData]).toLocaleString()
-    let guaritiOggi = Number(datasets['dimessi_guariti'].avg_1[datasets['dimessi_guariti'].avg_1.length - 1 - giorniData]).toLocaleString()
-    let mortiOggi = Number(datasets['deceduti'].avg_1[datasets['deceduti'].avg_1.length - 1 - giorniData]).toLocaleString()
-    let tamponi = Number(datasets['tamponi'].avg_1[datasets['tamponi'].avg_1.length - 1 - giorniData]).toLocaleString()
+    let infettiOggi = getNumberFromDataset('nuovi_positivi', giorniData)
+    let guaritiOggi = getNumberFromDataset('dimessi_guariti', giorniData)
+    let mortiOggi = getNumberFromDataset('deceduti', giorniData)
+    let tamponi = getNumberFromDataset('tamponi', giorniData)
 
-    $('#dataAggiornamento').text(dataAggiornamento)
+    $('#dataAggiornamento').text(dataAggiornamento.toLocaleDateString())
     $('#infettiOggi').text('Nuovi infetti: +' + infettiOggi)
     $('#guaritiOggi').text('Nuovi guariti: +' + guaritiOggi)
     $('#mortiOggi').text('Nuovi decessi: +' + mortiOggi)
@@ -161,3 +161,7 @@ window.onload = function() {
 }
 
 let regioniSelezionate = [''];
+
+function getNumberFromDataset(dataset, giorniData) {
+    return Number(datasets[dataset].avg_1[datasets[dataset].avg_1.length - 1 - giorniData]).toLocaleString()
+}
