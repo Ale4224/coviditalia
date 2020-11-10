@@ -1,5 +1,5 @@
 ### GRAFICI DATI COVID ITALIA
 
-https://ale4224.github.io/coviditalia/
+ale4224.github.io/coviditalia
 
-Dati recuperati dal repository del Ministero della Salute https://github.com/pcm-dpc/COVID-19
+Dati recuperati dal repository del Ministero della Salute github.com/pcm-dpc/COVID-19
