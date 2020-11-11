@@ -78,54 +78,40 @@ let popolateData = function(dati_covid, regione) {
 
     let rateo_tamponi_nuovi_positivi = rateoListe(nuovi_positivi, tamponi, 1000)
 
-    datasets['nuovi_positivi' + regione] = {
-        title: 'Nuovi positivi ' + regione,
-        id: 'nuovi_positivi' + regione,
-        avg_1: nuovi_positivi,
-    }
-    datasets['ricoverati_con_sintomi' + regione] = {
-        title: 'Ricoverati con sintomi ' + regione,
-        id: 'ricoverati_con_sintomi' + regione,
-        avg_1: ricoverati_con_sintomi,
-    }
-    datasets['terapia_intensiva' + regione] = {
-        title: 'Terapia intensiva ' + regione,
-        id: 'terapia_intensiva' + regione,
-        avg_1: terapia_intensiva,
+    let delta_nuovi_positivi = totaleToGiornaliero(nuovi_positivi)
+
+    addToDataset('nuovi_positivi', regione, 'Nuovi positivi', nuovi_positivi)
+    addToDataset('delta_nuovi_positivi', regione, 'Delta nuovi positivi', delta_nuovi_positivi)
+    addToDataset('ricoverati_con_sintomi', regione, 'Ricoverati con sintomi', ricoverati_con_sintomi)
+    addToDataset('terapia_intensiva', regione, 'Terapia intensiva', terapia_intensiva)
+    addToDataset('tamponi', regione, 'Tamponi', tamponi)
+    addToDataset('ospedalizzati', regione, 'Ospedalizzati', ospedalizzati)
+    addToDataset('deceduti', regione, 'Deceduti', deceduti)
+    addToDataset('dimessi_guariti', regione, 'Guariti', dimessi_guariti)
+    addToDataset('rateo_tamponi_nuovi_positivi', regione, 'Nuovi positivi per mille tamponi', rateo_tamponi_nuovi_positivi)
+    addToDataset('ospedalizzati', regione, 'Ospedalizzati', ospedalizzati)
+    addToDataset('ospedalizzati', regione, 'Ospedalizzati', ospedalizzati)
+}
+
+let addToDataset = function(id, regione, title, list) {
+
+    let ds = {
+        title: title,
+        id: id,
+        avg_1: list,
+        avg_3: listAvg(list, 3),
+        avg_7: listAvg(list, 7),
     }
 
+    if (regione == '') {
+        datasets[id] = ds
+        datasets[id].regioni = {}
+        return
+    }
+    ds.regione = regione
+    ds.title += ' ' + regione
+    datasets[id].regioni[regione] = ds
 
-    datasets['tamponi' + regione] = {
-        title: 'Tamponi ' + regione,
-        id: 'tamponi' + regione,
-        avg_1: tamponi,
-    }
-    datasets['ospedalizzati' + regione] = {
-        title: 'Ospedalizzati ' + regione,
-        id: 'ospedalizzati' + regione,
-        avg_1: ospedalizzati,
-    }
-    datasets['deceduti' + regione] = {
-        title: 'Deceduti ' + regione,
-        id: 'deceduti' + regione,
-        avg_1: deceduti,
-    }
-    datasets['dimessi_guariti' + regione] = {
-        title: 'Guariti ' + regione,
-        id: 'dimessi_guariti' + regione,
-        avg_1: dimessi_guariti,
-    }
-
-    datasets['rateo_tamponi_nuovi_positivi' + regione] = {
-        title: 'Nuovi positivi per mille tamponi ' + regione,
-        id: 'rateo_tamponi_nuovi_positivi' + regione,
-        avg_1: rateo_tamponi_nuovi_positivi,
-    }
-
-    for (ds in datasets) {
-        datasets[ds].avg_3 = listAvg(datasets[ds].avg_1, 3)
-        datasets[ds].avg_7 = listAvg(datasets[ds].avg_1, 7)
-    }
 }
 
 let date = {}

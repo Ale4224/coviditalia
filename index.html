@@ -44,6 +44,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.quicksearch/2.4.0/jquery.quicksearch.min.js" integrity="sha512-EftvELo+CRsl6dER2p2FfP6JnueIg2g4i9zz3P42S5eTrtMLybcJ7D4+Sk9BlztI6sGutndC2vx2Pd4FcjgDhQ==" crossorigin="anonymous"></script>
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script src="./js/lib/jquery.multi-select.js"></script>
+    <script src="./js/lib/categorizr.js"></script>
     <script src="./js/data.js"></script>
     <script src="./js/rendering.js"></script>
 
@@ -54,52 +55,21 @@
     <div class="h3 text-center">
         <button type="button" class="btn btn-link btn-lg" onclick="firstDate()">&lt;--</button>
         <button type="button" class="btn btn-link btn-lg" onclick="previousDate()">&lt;-</button> <span id="dataAggiornamento">
-            ###DATA###
-        </span>
+                ###DATA###
+            </span>
         <button type="button" class="btn btn-link btn-lg" onclick="nextDate()">-&gt;</button>
         <button type="button" class="btn btn-link btn-lg" onclick="lastDate()">--&gt;</button>
     </div>
-    <div class="h5 text-center" id="infettiOggi"></div>
-    <div class="h5 text-center" id="guaritiOggi"></div>
-    <div class="h5 text-center" id="mortiOggi"></div>
-    <div class="h5 text-center" id="tamponiOggi"></div>
+    <div id="datiGiornalieri">
+        <div class="h5 text-center" id="infettiOggi"></div>
+        <div class="h5 text-center" id="guaritiOggi"></div>
+        <div class="h5 text-center" id="mortiOggi"></div>
+        <div class="h5 text-center" id="tamponiOggi"></div>
+        <div class="h5 text-center" id="rateoTamponiInfettiOggi"></div>
+    </div>
     <div class="row mt-5" style=" font-size: 18px;">
-        <div class="col-md-2 offset-md-1">
-            <input type="checkbox" id="nuovi_positivi" onchange="onChangeCheckbox('nuovi_positivi')" checked="true">
-            <label for="nuovi_positivi">Nuovi positivi</label>
-            <br>
-
-            <input type="checkbox" id="ricoverati_con_sintomi" onchange="onChangeCheckbox('ricoverati_con_sintomi')">
-            <label for="ricoverati_con_sintomi">Ricoverati con sintomi</label>
-            <br>
-
-            <input type="checkbox" id="terapia_intensiva" onchange="onChangeCheckbox('terapia_intensiva')">
-            <label for="terapia_intensiva">Terapia intensiva</label>
-            <br>
-
-            <input type="checkbox" id="ospedalizzati" onchange="onChangeCheckbox('ospedalizzati')">
-            <label for="ospedalizzati">Ospedalizzati</label>
-            <br>
-
-            <input type="checkbox" id="deceduti" onchange="onChangeCheckbox('deceduti')">
-            <label for="deceduti">Deceduti</label>
-            <br>
-        </div>
-        <div class="col-md-3">
-
-            <input type="checkbox" id="tamponi" onchange="onChangeCheckbox('tamponi')">
-            <label for="tamponi">Tamponi</label>
-            <br>
-
-            <input type="checkbox" id="dimessi_guariti" onchange="onChangeCheckbox('dimessi_guariti')">
-            <label for="dimessi_guariti">Guariti</label>
-            <br>
-
-            <input type="checkbox" id="rateo_tamponi_nuovi_positivi" onchange="onChangeCheckbox('rateo_tamponi_nuovi_positivi')">
-            <label for="rateo_tamponi_nuovi_positivi">Nuovi positivi per mille tamponi</label>
-            <br>
-
-        </div>
+        <div class="col-md-2 offset-md-1" id="checkboxDatasets0"></div>
+        <div class="col-md-3" id="checkboxDatasets1"></div>
         <div class="col-md-1">
             <input type="radio" id="avg_1" value="avg_1" name="avg" onchange="onChangeCheckboxAvg()" checked="true">
             <label for="avg_1">Avg 1</label>
@@ -142,14 +112,21 @@
         <div class="col-md-2">
             <label for="regioni">Regioni</label>
             <select name="regioni" id="regioni" onchange="renderFromList()">
-                <option value="" selected>Tutte</option>
-            </select>
+                    <option value="" selected>Tutte</option>
+                </select>
         </div>
     </div>
 
     <div class="row" style="height: 75%;">
         <div class="col-md-10 offset-sm-1" id="chartContainer" style="height: 700px;"></div>
     </div>
+
+    <footer class="page-footer font-small blue">
+        <div class="footer-copyright text-center py-3">Dati forniti dal
+            <a href="https://github.com/pcm-dpc/COVID-19"> ministero della salute</a>
+        </div>
+    </footer>
+
 </body>
 
 </html>

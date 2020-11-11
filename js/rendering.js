@@ -1,15 +1,3 @@
-const colorScheme = [
-    "#25CCF7", "#FD7272", "#54a0ff", "#00d2d3",
-    "#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#34495e",
-    "#16a085", "#27ae60", "#2980b9", "#8e44ad", "#2c3e50",
-    "#f1c40f", "#e67e22", "#e74c3c", "#ecf0f1", "#95a5a6",
-    "#f39c12", "#d35400", "#c0392b", "#bdc3c7", "#7f8c8d",
-    "#55efc4", "#81ecec", "#74b9ff", "#a29bfe", "#dfe6e9",
-    "#00b894", "#00cec9", "#0984e3", "#6c5ce7", "#ffeaa7",
-    "#fab1a0", "#ff7675", "#fd79a8", "#fdcb6e", "#e17055",
-    "#d63031", "#feca57", "#5f27cd", "#54a0ff", "#01a3a4"
-]
-
 let listEnabled = []
 
 let rangeMonth = 1000
@@ -31,26 +19,36 @@ let generateDataPoints = function(list, date) {
     return l
 }
 
+let addDataToChart = function(index, title, list, date) {
+    chart.options.axisY.push({
+        title: title,
+        titleFontSize: 20,
+        labelFontSize: 15,
+    })
+    chart.options.data.push({
+        type: "line",
+        name: title,
+        showInLegend: true,
+        axisYIndex: index,
+        dataPoints: generateDataPoints(list, date),
+    })
+}
+let addDataToChartByRegione = function(index, id, regione, avgType) {
+    addDataToChart(index, datasets[id].regioni[regione].title, datasets[id].regioni[regione][avgType], date[avgType])
+}
+let addDataToChartItalia = function(index, id, avgType) {
+    addDataToChart(index, datasets[id].title, datasets[id][avgType], date[avgType])
+}
 let renderFromList = function() {
     chart.options.axisY = []
     chart.options.data = []
 
     for (let i in listEnabled) {
-        for (let regione of regioniSelezionate) {
-            id = listEnabled[i] + regione
-            chart.options.axisY.push({
-                title: datasets[id].title,
-                titleFontSize: 20,
-                labelFontSize: 15,
-            })
-            chart.options.data.push({
-                type: "line",
-                name: datasets[id].title,
-                showInLegend: true,
-                axisYIndex: i,
-                dataPoints: generateDataPoints(datasets[id][avgType], date[avgType]),
-            })
-        }
+        let id = listEnabled[i]
+        addDataToChartItalia(i, id, avgType)
+        regioniSelezionate.filter(r => r != '').forEach(regione => {
+            addDataToChartByRegione(i, id, regione, avgType)
+        })
     }
     chart.render();
 }
@@ -85,12 +83,14 @@ let setDateData = function() {
     let guaritiOggi = getNumberFromDataset('dimessi_guariti', giorniData)
     let mortiOggi = getNumberFromDataset('deceduti', giorniData)
     let tamponi = getNumberFromDataset('tamponi', giorniData)
+    let rateoTamponiInfettiOggi = getNumberFromDataset('rateo_tamponi_nuovi_positivi', giorniData)
 
     $('#dataAggiornamento').text(dataAggiornamento.toLocaleDateString())
     $('#infettiOggi').text('Nuovi infetti: +' + infettiOggi)
     $('#guaritiOggi').text('Nuovi guariti: +' + guaritiOggi)
     $('#mortiOggi').text('Nuovi decessi: +' + mortiOggi)
     $('#tamponiOggi').text('Nuovi tamponi effettuati: +' + tamponi)
+    $('#rateoTamponiInfettiOggi').text('Rateo infetti per 1000 tamponi: ' + rateoTamponiInfettiOggi)
 }
 
 let previousDate = function() {
@@ -156,12 +156,39 @@ window.onload = function() {
 
     getData().then(() => {
         setDateData()
-        addDataset('nuovi_positivi')
+        renderFiltri()
+        $('#nuovi_positivi').click()
     })
 }
 
 let regioniSelezionate = [''];
 
-function getNumberFromDataset(dataset, giorniData) {
+let getNumberFromDataset = function(dataset, giorniData) {
     return Number(datasets[dataset].avg_1[datasets[dataset].avg_1.length - 1 - giorniData]).toLocaleString()
+}
+
+let renderFiltri = function() {
+    if (categorizr.isMobile)
+        renderFiltriDesktop()
+        //renderFiltriMobile()
+    else
+        renderFiltriDesktop()
+}
+
+let renderFiltriDesktop = function() {
+    Object.keys(datasets).forEach(renderCheckboxDesktop)
+}
+
+let renderCheckboxDesktop = function(dsName, index) {
+    let ds = datasets[dsName]
+    let htmlFiltro = `
+    <input type="checkbox" id="` + ds.id + `" onchange="onChangeCheckbox('` + ds.id + `')">
+    <label for="` + ds.id + `">` + ds.title + `</label>
+    <br>
+    `
+    $('#checkboxDatasets' + (index % 2)).append(htmlFiltro)
+}
+
+let renderFiltriMobile = function() {
+
 }
