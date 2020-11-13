@@ -125,12 +125,12 @@ let lastDate = function() {
 let multiSelectConfig = {
     keepOrder: true,
     afterSelect: function(value) {
-        sendEvent('region_select_' + value, 'region_select', value + ' selected')
+        sendEvent('region_select_' + value[0], 'region_select', value[0] + ' selected')
         regioniSelezionate.push(value[0])
         renderFromList()
     },
     afterDeselect: function(value) {
-        sendEvent('region_deselect_' + value, 'region_deselect', value + ' deselected')
+        sendEvent('region_deselect_' + value[0], 'region_deselect', value[0] + ' deselected')
         regioniSelezionate = regioniSelezionate.filter(e => e != value[0])
         renderFromList()
     },
