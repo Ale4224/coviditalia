@@ -47,6 +47,7 @@
     <script src="./js/lib/categorizr.js"></script>
     <script src="./js/data.js"></script>
     <script src="./js/rendering.js"></script>
+    <script src="./js/gEvents.js"></script>
 
 </head>
 
@@ -85,27 +86,27 @@
         </div>
         <div class="col-md-2">
 
-            <input type="radio" id="allDate" value="allDate" name="dates" onchange="rangeMonth = 1000; renderFromList()" checked="true">
+            <input type="radio" id="allDate" value="allDate" name="dates" onchange="changeDateRange('all')" checked="true">
             <label for="allDate">Tutte le date</label>
             <br>
 
-            <input type="radio" id="last8month" value="last8month" name="dates" onchange="rangeMonth = 8; renderFromList()">
+            <input type="radio" id="last8month" value="last8month" name="dates" onchange="changeDateRange(8)">
             <label for="last8month">8 mesi</label>
             <br>
 
-            <input type="radio" id="last6month" value="last6month" name="dates" onchange="rangeMonth = 6; renderFromList()">
+            <input type="radio" id="last6month" value="last6month" name="dates" onchange="changeDateRange(6)">
             <label for="last6month">6 mesi</label>
             <br>
 
-            <input type="radio" id="last4month" value="last4month" name="dates" onchange="rangeMonth = 4; renderFromList()">
+            <input type="radio" id="last4month" value="last4month" name="dates" onchange="changeDateRange(4)">
             <label for="last4month">4 mesi</label>
             <br>
 
-            <input type="radio" id="last2month" value="last2month" name="dates" onchange="rangeMonth = 2; renderFromList()">
+            <input type="radio" id="last2month" value="last2month" name="dates" onchange="changeDateRange(2)">
             <label for="last2month">2 mesi</label>
             <br>
 
-            <input type="radio" id="last1month" value="last1month" name="dates" onchange="rangeMonth = 1; renderFromList()">
+            <input type="radio" id="last1month" value="last1month" name="dates" onchange="changeDateRange(1)">
             <label for="last1month">1 mese</label>
             <br>
         </div>

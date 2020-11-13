@@ -45,9 +45,11 @@ let renderFromList = function() {
 
     for (let i in listEnabled) {
         let id = listEnabled[i]
-        addDataToChartItalia(i, id, avgType)
-        regioniSelezionate.filter(r => r != '').forEach(regione => {
-            addDataToChartByRegione(i, id, regione, avgType)
+        regioniSelezionate.forEach(regione => {
+            if (regione == '')
+                addDataToChartItalia(i, id, avgType)
+            else
+                addDataToChartByRegione(i, id, regione, avgType)
         })
     }
     chart.render();
@@ -63,6 +65,7 @@ let removeDataset = function(id) {
 }
 
 let onChangeCheckbox = function(id) {
+    sendEvent('checkbox_click_' + id, 'checkbox_click', id + ' clicked')
     if (document.getElementById(id).checked) {
         addDataset(id)
     } else {
@@ -72,6 +75,7 @@ let onChangeCheckbox = function(id) {
 
 let onChangeCheckboxAvg = function() {
     avgType = [].slice.call(document.getElementsByName('avg'), 0).filter(x => x.checked)[0].id
+    sendEvent('checkbox_avg_click_' + avgType, 'checkbox_avg_click', avgType + ' clicked')
     renderFromList()
 }
 
@@ -121,13 +125,21 @@ let lastDate = function() {
 let multiSelectConfig = {
     keepOrder: true,
     afterSelect: function(value) {
+        sendEvent('region_select_' + value, 'region_select', value + ' selected')
         regioniSelezionate.push(value[0])
         renderFromList()
     },
     afterDeselect: function(value) {
+        sendEvent('region_deselect_' + value, 'region_deselect', value + ' deselected')
         regioniSelezionate = regioniSelezionate.filter(e => e != value[0])
         renderFromList()
     },
+}
+
+let changeDateRange = function(range) {
+    sendEvent('date_range_click_' + range, 'date_range_click', range + ' clicked')
+    rangeMonth = range == 'all' ? 1000 : range
+    renderFromList()
 }
 
 let chart
