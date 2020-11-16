@@ -71,6 +71,7 @@ let popolateData = function(dati_covid, regione) {
     let totale_ospedalizzati = dati_covid.map(a => a.totale_ospedalizzati)
     let totale_tamponi = dati_covid.map(a => a.tamponi)
     let totale_dimessi_guariti = dati_covid.map(a => a.dimessi_guariti)
+    let totale_casi = dati_covid.map(a => a.totale_casi)
     let deceduti = totaleToGiornaliero(totale_deceduti)
     let ospedalizzati = totaleToGiornaliero(totale_ospedalizzati)
     let tamponi = totaleToGiornaliero(totale_tamponi)
@@ -78,19 +79,19 @@ let popolateData = function(dati_covid, regione) {
 
     let rateo_tamponi_nuovi_positivi = rateoListe(nuovi_positivi, tamponi, 1000)
 
-    let delta_nuovi_positivi = totaleToGiornaliero(nuovi_positivi)
+    let variazione_nuovi_positivi = totaleToGiornaliero(nuovi_positivi)
 
     addToDataset('nuovi_positivi', regione, 'Nuovi positivi', nuovi_positivi)
-    addToDataset('delta_nuovi_positivi', regione, 'Delta nuovi positivi', delta_nuovi_positivi)
+    addToDataset('tamponi', regione, 'Tamponi', tamponi)
+    addToDataset('rateo_tamponi_nuovi_positivi', regione, 'Nuovi positivi per mille tamponi', rateo_tamponi_nuovi_positivi)
+    addToDataset('deceduti', regione, 'Deceduti', deceduti)
+    addToDataset('variazione_nuovi_positivi', regione, 'Variazione nuovi positivi', variazione_nuovi_positivi)
     addToDataset('ricoverati_con_sintomi', regione, 'Ricoverati con sintomi', ricoverati_con_sintomi)
     addToDataset('terapia_intensiva', regione, 'Terapia intensiva', terapia_intensiva)
-    addToDataset('tamponi', regione, 'Tamponi', tamponi)
-    addToDataset('ospedalizzati', regione, 'Ospedalizzati', ospedalizzati)
-    addToDataset('deceduti', regione, 'Deceduti', deceduti)
+    addToDataset('ospedalizzati', regione, 'Ospedalizzati', totale_ospedalizzati)
     addToDataset('dimessi_guariti', regione, 'Guariti', dimessi_guariti)
-    addToDataset('rateo_tamponi_nuovi_positivi', regione, 'Nuovi positivi per mille tamponi', rateo_tamponi_nuovi_positivi)
-    addToDataset('ospedalizzati', regione, 'Ospedalizzati', ospedalizzati)
-    addToDataset('ospedalizzati', regione, 'Ospedalizzati', ospedalizzati)
+    addToDataset('totale_casi', regione, 'Totale casi', totale_casi)
+    addToDataset('totale_deceduti', regione, 'Totale deceduti', totale_deceduti)
 }
 
 let addToDataset = function(id, regione, title, list) {
