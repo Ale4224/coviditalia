@@ -65,10 +65,11 @@ let removeDataset = function(id) {
 }
 
 let onChangeCheckbox = function(id) {
-    sendEvent('checkbox_click_' + id, 'checkbox_click', id + ' clicked')
     if (document.getElementById(id).checked) {
+        sendEvent('checkbox_check_' + id, 'checkbox_check', id + ' checked')
         addDataset(id)
     } else {
+        sendEvent('checkbox_uncheck_' + id, 'checkbox_uncheck', id + ' unchecked')
         removeDataset(id)
     }
 }
