@@ -26,6 +26,7 @@ totaleToGiornaliero = function(list) {
 }
 
 listAvg = function(list, avgNumber) {
+    list = [...list].reverse()
     let l = []
     let length = list.length
     let somma = 0;
@@ -37,11 +38,11 @@ listAvg = function(list, avgNumber) {
             continue
         }
         if (i == length - 1) {
-            l.push(parseInt(somma / (length - parseInt(length / avgNumber) * avgNumber)))
+            l.push(parseInt(somma / (length % avgNumber)))
             break
         }
     }
-    return l
+    return l.reverse()
 }
 
 rateoListe = function(list1, list2, scale) {
@@ -73,7 +74,6 @@ let popolateData = function(dati_covid, regione) {
     let totale_dimessi_guariti = dati_covid.map(a => a.dimessi_guariti)
     let totale_casi = dati_covid.map(a => a.totale_casi)
     let deceduti = totaleToGiornaliero(totale_deceduti)
-    let ospedalizzati = totaleToGiornaliero(totale_ospedalizzati)
     let tamponi = totaleToGiornaliero(totale_tamponi)
     let dimessi_guariti = totaleToGiornaliero(totale_dimessi_guariti)
 
