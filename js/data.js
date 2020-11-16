@@ -73,6 +73,7 @@ let popolateData = function(dati_covid, regione) {
     let totale_tamponi = dati_covid.map(a => a.tamponi)
     let totale_dimessi_guariti = dati_covid.map(a => a.dimessi_guariti)
     let totale_casi = dati_covid.map(a => a.totale_casi)
+    let totale_positivi = dati_covid.map(a => a.totale_positivi)
     let deceduti = totaleToGiornaliero(totale_deceduti)
     let tamponi = totaleToGiornaliero(totale_tamponi)
     let dimessi_guariti = totaleToGiornaliero(totale_dimessi_guariti)
@@ -91,6 +92,7 @@ let popolateData = function(dati_covid, regione) {
     addToDataset('ospedalizzati', regione, 'Ospedalizzati', totale_ospedalizzati)
     addToDataset('dimessi_guariti', regione, 'Guariti', dimessi_guariti)
     addToDataset('totale_casi', regione, 'Totale casi', totale_casi)
+    addToDataset('totale_positivi', regione, 'Totale positivi', totale_positivi)
     addToDataset('totale_deceduti', regione, 'Totale deceduti', totale_deceduti)
 }
 
