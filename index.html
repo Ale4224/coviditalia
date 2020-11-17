@@ -45,6 +45,8 @@
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script src="./js/lib/jquery.multi-select.js"></script>
     <script src="./js/lib/categorizr.js"></script>
+    <script src="./js/lib/lib-r-math.js"></script>
+    <script src="./js/gammaDistribution.js"></script>
     <script src="./js/data.js"></script>
     <script src="./js/rendering.js"></script>
     <script src="./js/gEvents.js"></script>
@@ -80,8 +82,16 @@
             <label for="avg_3">Avg 3</label>
             <br>
 
-            <input type="radio" id="avg_7" value="avg_1" name="avg" onchange="onChangeCheckboxAvg()">
+            <input type="radio" id="avg_7" value="avg_7" name="avg" onchange="onChangeCheckboxAvg()">
             <label for="avg_7">Avg 7</label>
+            <br>
+
+            <input type="radio" id="avg_15" value="avg_15" name="avg" onchange="onChangeCheckboxAvg()">
+            <label for="avg_15">Avg 15</label>
+            <br>
+
+            <input type="radio" id="avg_30" value="avg_30" name="avg" onchange="onChangeCheckboxAvg()">
+            <label for="avg_30">Avg 30</label>
             <br>
         </div>
         <div class="col-md-2">
@@ -124,7 +134,7 @@
 
     <footer class="page-footer font-small blue">
         <div class="footer-copyright text-center py-3">Dati forniti dal
-            <a href="https://github.com/pcm-dpc/COVID-19"> ministero della salute</a>
+            <a href="https://github.com/pcm-dpc/COVID-19" target="_blank"> ministero della salute</a>
         </div>
     </footer>
 

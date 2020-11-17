@@ -1,19 +1,20 @@
 let regioni = ["Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna", "Friuli Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche", "Molise", "P.A. Bolzano", "P.A. Trento", "Piemonte", "Puglia", "Sardegna", "Sicilia", "Toscana", "Umbria", "Valle d'Aosta", "Veneto"]
 
-getData = async function() {
+let getData = async function() {
     let urlRegioni = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-regioni.json'
     let urlItalia = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json'
     await Promise.all([fetch(urlItalia)
         .then(response => response.json())
         .then(json => popolateData(json, ''))
-        .catch(error => console.error(error)), fetch(urlRegioni)
+        .catch(error => console.error(error)),
+        fetch(urlRegioni)
         .then(response => response.json())
         .then(popolateDataRegione)
         .catch(error => console.error(error))
     ])
 }
 
-totaleToGiornaliero = function(list) {
+let totaleToGiornaliero = function(list) {
     l = []
     for (d in list) {
         if (d == 0) {
@@ -25,27 +26,29 @@ totaleToGiornaliero = function(list) {
     return l
 }
 
-listAvg = function(list, avgNumber) {
-    list = [...list].reverse()
+let listAvg = function(listIn, avgNumber, decimal) {
+    list = [...listIn].reverse()
     let l = []
     let length = list.length
     let somma = 0;
     for (i in list) {
         somma += list[i]
         if (i != 0 && (Number(i) + 1) % avgNumber == 0) {
-            l.push(parseInt(somma / avgNumber))
+            l.push(somma / avgNumber)
             somma = 0
             continue
         }
         if (i == length - 1) {
-            l.push(parseInt(somma / (length % avgNumber)))
+            l.push(somma / (length % avgNumber))
             break
         }
     }
-    return l.reverse()
+    if (!decimal)
+        decimal = 0
+    return l.map(x => Number(x.toFixed(decimal))).reverse()
 }
 
-rateoListe = function(list1, list2, scale) {
+let rateoListe = function(list1, list2, scale) {
     return list1.map((e, i) => parseInt((e / list2[i]) * scale))
 }
 
@@ -55,6 +58,26 @@ let popolateDataRegione = function(dati_covid) {
     }
 }
 
+let calcoloRT = function(lista_infetti) {
+    let A = 1.87
+    let B = 0.28
+    let result = []
+    let gammaResults = libR.Gamma().dgamma([...Array(lista_infetti.length).keys()], A, B);
+    for (t in lista_infetti) {
+        if (t == 0) {
+            result.push(0)
+            continue
+        }
+        let sum = 0
+        for (let s = 1; s <= t; s++) {
+            let gamma = gammaResults[s]
+            sum += gamma * lista_infetti[t - s]
+        }
+        result.push(lista_infetti[t] / sum)
+    }
+    return result.map(x => Number(x.toFixed(2)));
+}
+
 let popolateData = function(dati_covid, regione) {
 
     if (regione == '')
@@ -62,6 +85,8 @@ let popolateData = function(dati_covid, regione) {
             avg_1: dati_covid.map(a => new Date(a.data)),
             avg_3: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 3 == 0),
             avg_7: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 7 == 0),
+            avg_15: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 15 == 0),
+            avg_30: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 30 == 0),
         }
 
     let nuovi_positivi = dati_covid.map(a => a.nuovi_positivi)
@@ -82,6 +107,8 @@ let popolateData = function(dati_covid, regione) {
 
     let variazione_nuovi_positivi = totaleToGiornaliero(nuovi_positivi)
 
+    let calcolo_r_t = calcoloRT(nuovi_positivi)
+
     addToDataset('nuovi_positivi', regione, 'Nuovi positivi', nuovi_positivi)
     addToDataset('tamponi', regione, 'Tamponi', tamponi)
     addToDataset('rateo_tamponi_nuovi_positivi', regione, 'Nuovi positivi per mille tamponi', rateo_tamponi_nuovi_positivi)
@@ -94,16 +121,20 @@ let popolateData = function(dati_covid, regione) {
     addToDataset('totale_casi', regione, 'Totale casi', totale_casi)
     addToDataset('totale_positivi', regione, 'Totale positivi', totale_positivi)
     addToDataset('totale_deceduti', regione, 'Totale deceduti', totale_deceduti)
+    addToDataset('calcolo_r_t', regione, 'Calcolo Rt (beta)', calcolo_r_t, 'https://it.wikipedia.org/wiki/Numero_di_riproduzione_di_base#Numero_di_riproduzione_netto_al_tempo_t', 2)
 }
 
-let addToDataset = function(id, regione, title, list) {
+let addToDataset = function(id, regione, title, list, link, decimal) {
 
     let ds = {
-        title: title,
-        id: id,
+        title,
+        id,
+        link,
         avg_1: list,
-        avg_3: listAvg(list, 3),
-        avg_7: listAvg(list, 7),
+        avg_3: listAvg(list, 3, decimal),
+        avg_7: listAvg(list, 7, decimal),
+        avg_15: listAvg(list, 15, decimal),
+        avg_30: listAvg(list, 30, decimal),
     }
 
     if (regione == '') {

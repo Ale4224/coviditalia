@@ -194,9 +194,10 @@ let renderFiltriDesktop = function() {
 
 let renderCheckboxDesktop = function(dsName, index) {
     let ds = datasets[dsName]
+    let link = ds.link ? ' [<a href="' + ds.link + '" target="_blank">info</a>]' : ''
     let htmlFiltro = `
     <input type="checkbox" id="` + ds.id + `" onchange="onChangeCheckbox('` + ds.id + `')">
-    <label for="` + ds.id + `">` + ds.title + `</label>
+    <label for="` + ds.id + `">` + ds.title + link + `</label>
     <br>
     `
     $('#checkboxDatasets' + (index % 2)).append(htmlFiltro)
