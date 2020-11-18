@@ -58,11 +58,11 @@ let popolateDataRegione = function(dati_covid) {
     }
 }
 
+const A = 1.87
+const B = 0.28
+const gammaResults = libR.Gamma().dgamma([...Array(1000).keys()], A, B)
 let calcoloRT = function(lista_infetti) {
-    let A = 1.87
-    let B = 0.28
     let result = []
-    let gammaResults = libR.Gamma().dgamma([...Array(lista_infetti.length).keys()], A, B);
     for (t in lista_infetti) {
         if (t == 0) {
             result.push(0)
@@ -70,8 +70,7 @@ let calcoloRT = function(lista_infetti) {
         }
         let sum = 0
         for (let s = 1; s <= t; s++) {
-            let gamma = gammaResults[s]
-            sum += gamma * lista_infetti[t - s]
+            sum += gammaResults[s] * lista_infetti[t - s]
         }
         result.push(lista_infetti[t] / sum)
     }
