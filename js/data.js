@@ -1,5 +1,7 @@
 let regioni = ["Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna", "Friuli Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche", "Molise", "P.A. Bolzano", "P.A. Trento", "Piemonte", "Puglia", "Sardegna", "Sicilia", "Toscana", "Umbria", "Valle d'Aosta", "Veneto"]
 
+let rawData = {}
+
 let getData = async function() {
     let urlRegioni = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-regioni.json'
     let urlItalia = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json'
@@ -14,7 +16,7 @@ let getData = async function() {
     ])
 }
 
-let totaleToGiornaliero = function(list) {
+let totaleToGiornaliero = function(list, ignoreNaN) {
     let l = []
     for (d in list) {
         if (d == 0) {
@@ -22,7 +24,10 @@ let totaleToGiornaliero = function(list) {
             continue
         }
         let giornaliero = list[d] - list[d - 1]
-        l.push(giornaliero > 0? giornaliero: NaN)
+        if(ignoreNaN)
+            l.push(giornaliero)
+        else 
+            l.push(giornaliero >= 0? giornaliero: NaN)
     }
     return l
 }
@@ -60,10 +65,11 @@ let listAvg = function(listIn, avgNumber, decimal) {
 let rateoListe = function(list1, list2, scale) {
     return list1.map((e, i) => parseInt((e / list2[i]) * scale))
 }
-
 let popolateDataRegione = function(dati_covid) {
     for (const r of regioni) {
-        popolateData(dati_covid.filter(a => a.denominazione_regione == r), r)
+        dati_regionali = dati_covid.filter(a => a.denominazione_regione == r)
+        rawData[r] = dati_regionali
+        popolateData(dati_regionali, r)
     }
 }
 
@@ -89,6 +95,7 @@ let calcoloRT = function(lista_infetti) {
 let popolateData = function(dati_covid, regione) {
 
     if (regione == '')
+        rawData.nazionale = dati_covid
         date = {
             avg_1: dati_covid.map(a => new Date(a.data)),
             avg_3: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 3 == 0),
@@ -113,7 +120,7 @@ let popolateData = function(dati_covid, regione) {
 
     let rateo_tamponi_nuovi_positivi = rateoListe(nuovi_positivi, tamponi, 1000)
 
-    let variazione_nuovi_positivi = totaleToGiornaliero(nuovi_positivi)
+    let variazione_nuovi_positivi = totaleToGiornaliero(nuovi_positivi, true)
 
     let calcolo_r_t = calcoloRT(nuovi_positivi)
 
