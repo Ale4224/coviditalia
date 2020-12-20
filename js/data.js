@@ -15,13 +15,14 @@ let getData = async function() {
 }
 
 let totaleToGiornaliero = function(list) {
-    l = []
+    let l = []
     for (d in list) {
         if (d == 0) {
             l.push(list[d])
             continue
         }
-        l.push(list[d] - list[d - 1])
+        let giornaliero = list[d] - list[d - 1]
+        l.push(giornaliero > 0? giornaliero: NaN)
     }
     return l
 }
@@ -31,15 +32,23 @@ let listAvg = function(listIn, avgNumber, decimal) {
     let l = []
     let length = list.length
     let somma = 0;
+    let NaNCounter = 0;
     for (i in list) {
-        somma += list[i]
+
+        if(isNaN(list[i])){
+            NaNCounter++
+        } else {
+            somma += list[i]
+        }
+
         if (i != 0 && (Number(i) + 1) % avgNumber == 0) {
-            l.push(somma / avgNumber)
+            l.push(somma / (avgNumber - NaNCounter))
             somma = 0
+            NaNCounter = 0
             continue
         }
         if (i == length - 1) {
-            l.push(somma / (length % avgNumber))
+            l.push(somma / ((length % avgNumber) - NaNCounter))
             break
         }
     }
