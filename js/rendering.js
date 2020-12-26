@@ -1,16 +1,13 @@
 let listEnabled = []
 
-let rangeMonth = 1000
 let avgType = 'avg_1'
+let minRange = null
+let maxRange = null
 
 let generateDataPoints = function(list, date) {
     let l = []
 
-    let dateRange = moment().subtract(rangeMonth, 'months')
     for (i in list) {
-        if (moment(date[i]) < dateRange)
-            continue
-
         l.push({
             y: list[i],
             label: date[i].toLocaleDateString(),
@@ -52,7 +49,18 @@ let renderFromList = function() {
                 addDataToChartByRegione(i, id, regione, avgType)
         })
     }
-    chart.render();
+
+    let viewportMinimum = 0
+    if(minRange)
+        viewportMinimum = date[avgType].filter(d => d < minRange).length - 1
+
+    let viewportMaximum = date[avgType].length - 1
+    if(maxRange)
+        viewportMaximum = date[avgType].filter(d => d <= maxRange).length - 1
+
+    chart.options.axisX={viewportMinimum, viewportMaximum}
+
+    chart.render()
 }
 
 let addDataset = function(id) {
@@ -139,13 +147,34 @@ let multiSelectConfig = {
 
 let changeDateRange = function(range) {
     sendEvent('date_range_click_' + range, 'date_range_click', range + ' clicked')
-    rangeMonth = range == 'all' ? 1000 : range
+
+    maxRange = date[avgType][date[avgType].length - 1]
+    if(range == 'all')
+        minRange = 0
+    else
+        minRange = moment().subtract(range, 'months')
+    
     renderFromList()
 }
 
 let chart
 window.onload = function() {
     chart = new CanvasJS.Chart("chartContainer", {
+        zoomEnabled: true,
+        rangeChanging: function (e) {
+
+            if(e.trigger == 'reset'){
+                let element = Array.from(document.getElementsByName("dates")).filter(e => e.checked)[0]
+                element.onchange()
+                return
+            }
+
+            let minIndex = parseInt(e.axisX[0].viewportMinimum)
+            let maxIndex = parseInt(e.axisX[0].viewportMaximum)
+
+            minRange = date[avgType][minIndex]
+            maxRange = date[avgType][maxIndex]
+           },
         toolTip: {
             shared: true
         },
