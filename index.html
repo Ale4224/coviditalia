@@ -50,6 +50,20 @@
     <script src="./js/rendering.js"></script>
     <script src="./js/gEvents.js"></script>
 
+    <style>
+        html {
+            overflow: scroll;
+            overflow-x: hidden;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+         ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+
 </head>
 
 <body style="height: 100%;">
@@ -63,6 +77,7 @@
         <button type="button" class="btn btn-link btn-lg" onclick="lastDate()">--&gt;</button>
     </div>
     <div id="datiGiornalieri">
+        <div class="h5 text-center" id="totaliOggi"></div>
         <div class="h5 text-center" id="infettiOggi"></div>
         <div class="h5 text-center" id="guaritiOggi"></div>
         <div class="h5 text-center" id="mortiOggi"></div>

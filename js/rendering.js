@@ -51,14 +51,14 @@ let renderFromList = function() {
     }
 
     let viewportMinimum = 0
-    if(minRange)
+    if (minRange)
         viewportMinimum = date[avgType].filter(d => d < minRange).length - 1
 
     let viewportMaximum = date[avgType].length - 1
-    if(maxRange)
+    if (maxRange)
         viewportMaximum = date[avgType].filter(d => d <= maxRange).length - 1
 
-    chart.options.axisX={viewportMinimum, viewportMaximum}
+    chart.options.axisX = { viewportMinimum, viewportMaximum }
 
     chart.render()
 }
@@ -95,15 +95,47 @@ let setDateData = function() {
     let infettiOggi = getNumberFromDataset('nuovi_positivi', giorniData)
     let guaritiOggi = getNumberFromDataset('dimessi_guariti', giorniData)
     let mortiOggi = getNumberFromDataset('deceduti', giorniData)
-    let tamponi = getNumberFromDataset('tamponi', giorniData)
+    let tamponiOggi = getNumberFromDataset('tamponi', giorniData)
     let rateoTamponiInfettiOggi = getNumberFromDataset('rateo_tamponi_nuovi_positivi', giorniData)
+    let totaliOggi = getNumberFromDataset('totale_positivi', giorniData)
 
-    $('#dataAggiornamento').text(dataAggiornamento.toLocaleDateString())
-    $('#infettiOggi').text('Nuovi infetti: +' + infettiOggi)
-    $('#guaritiOggi').text('Nuovi guariti: +' + guaritiOggi)
-    $('#mortiOggi').text('Nuovi decessi: +' + mortiOggi)
-    $('#tamponiOggi').text('Nuovi tamponi effettuati: +' + tamponi)
-    $('#rateoTamponiInfettiOggi').text('Rateo infetti per 1000 tamponi: ' + rateoTamponiInfettiOggi)
+    let infettiIeri = getNumberFromDataset('nuovi_positivi', giorniData + 1)
+    let guaritiIeri = getNumberFromDataset('dimessi_guariti', giorniData + 1)
+    let mortiIeri = getNumberFromDataset('deceduti', giorniData + 1)
+    let tamponiIeri = getNumberFromDataset('tamponi', giorniData + 1)
+    let rateoTamponiInfettiIeri = getNumberFromDataset('rateo_tamponi_nuovi_positivi', giorniData + 1)
+    let totaliIeri = getNumberFromDataset('totale_positivi', giorniData + 1)
+
+    let infettiDiff = infettiOggi - infettiIeri
+    let guaritiDiff = guaritiOggi - guaritiIeri
+    let mortiDiff = mortiOggi - mortiIeri
+    let tamponiDiff = tamponiOggi - tamponiIeri
+    let rateoTamponiInfettiDiff = rateoTamponiInfettiOggi - rateoTamponiInfettiIeri
+    let totaliDiff = totaliOggi - totaliIeri
+
+    $('#dataAggiornamento').html(dataAggiornamento.toLocaleDateString())
+
+    renderData('#infettiOggi', 'Nuovi infetti: +', infettiOggi, infettiDiff, false)
+    renderData('#guaritiOggi', 'Nuovi guariti: +', guaritiOggi, guaritiDiff, true)
+    renderData('#totaliOggi', 'Totale positivi ad oggi: +', totaliOggi, totaliDiff, false)
+    renderData('#mortiOggi', 'Nuovi decessi: +', mortiOggi, mortiDiff, false)
+    renderData('#tamponiOggi', 'Nuovi tamponi effettuati: +', tamponiOggi, tamponiDiff, true)
+    renderData('#rateoTamponiInfettiOggi', 'Rateo infetti per 1000 tamponi: +', rateoTamponiInfettiOggi, rateoTamponiInfettiDiff, false)
+}
+
+let renderData = function(id, descr, numOggi, numDiff, isHighGood) {
+
+    if (isNaN(numDiff))
+        numDiff = 0
+
+    let isPos = numDiff > 0
+    let isNeg = numDiff < 0
+    let isZero = numDiff == 0
+
+    let color = isZero ? 'grey' : isPos != isHighGood ? 'red' : isNeg != isHighGood ? 'green' : 'grey'
+    let sign = isPos ? '+' : isNeg ? '-' : '+'
+
+    $(id).html(descr + numOggi.toLocaleString() + ' <span style="font-size: 16px;color:' + color + ';">(' + sign + Math.abs(numDiff).toLocaleString() + ' rispetto a ieri)</span>')
 }
 
 let previousDate = function() {
@@ -149,11 +181,11 @@ let changeDateRange = function(range) {
     sendEvent('date_range_click_' + range, 'date_range_click', range + ' clicked')
 
     maxRange = date[avgType][date[avgType].length - 1]
-    if(range == 'all')
+    if (range == 'all')
         minRange = 0
     else
         minRange = moment().subtract(range, 'months')
-    
+
     renderFromList()
 }
 
@@ -161,9 +193,9 @@ let chart
 window.onload = function() {
     chart = new CanvasJS.Chart("chartContainer", {
         zoomEnabled: true,
-        rangeChanging: function (e) {
+        rangeChanging: function(e) {
 
-            if(e.trigger == 'reset'){
+            if (e.trigger == 'reset') {
                 let element = Array.from(document.getElementsByName("dates")).filter(e => e.checked)[0]
                 element.onchange()
                 return
@@ -174,7 +206,7 @@ window.onload = function() {
 
             minRange = date[avgType][minIndex]
             maxRange = date[avgType][maxIndex]
-           },
+        },
         toolTip: {
             shared: true
         },
@@ -206,7 +238,7 @@ window.onload = function() {
 let regioniSelezionate = [''];
 
 let getNumberFromDataset = function(dataset, giorniData) {
-    return Number(datasets[dataset].avg_1[datasets[dataset].avg_1.length - 1 - giorniData]).toLocaleString()
+    return Number(datasets[dataset].avg_1[datasets[dataset].avg_1.length - 1 - giorniData])
 }
 
 let renderFiltri = function() {
