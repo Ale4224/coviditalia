@@ -1,10 +1,12 @@
 let regioni = ["Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna", "Friuli Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche", "Molise", "P.A. Bolzano", "P.A. Trento", "Piemonte", "Puglia", "Sardegna", "Sicilia", "Toscana", "Umbria", "Valle d'Aosta", "Veneto"]
+let codiciRegioni = ["ABR", "BAS", "CAL", "CAM", "EMR", "FVG", "LAZ", "LIG", "LOM", "MAR", "MOL", "PAB", "PAT", "PIE", "PUG", "SAR", "SIC", "TOS", "UMB", "VDA", "VEN"]
 
 let rawData = {}
 
 let getData = async function() {
     let urlRegioni = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-regioni.json'
     let urlItalia = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json'
+    let urlVaccini = 'https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/dati/somministrazioni-vaccini-summary-latest.json'
     await Promise.all([fetch(urlItalia)
         .then(response => response.json())
         .then(json => popolateData(json, ''))
@@ -14,6 +16,11 @@ let getData = async function() {
         .then(popolateDataRegione)
         .catch(error => console.error(error))
     ])
+    await
+    fetch(urlVaccini)
+        .then(response => response.json())
+        .then(json => popolaVaccini(json))
+        .catch(error => console.error(error))
 }
 
 let totaleToGiornaliero = function(list, ignoreNaN) {
@@ -24,12 +31,22 @@ let totaleToGiornaliero = function(list, ignoreNaN) {
             continue
         }
         let giornaliero = list[d] - list[d - 1]
-        if(ignoreNaN)
+        if (ignoreNaN)
             l.push(giornaliero)
-        else 
-            l.push(giornaliero >= 0? giornaliero: NaN)
+        else
+            l.push(giornaliero >= 0 ? giornaliero : NaN)
     }
     return l
+}
+
+let giornalieroToTotale = function(list) {
+    const result = []
+    let sum = 0
+    for (d of list) {
+        result.push(d + sum)
+        sum += isNaN(d) ? 0 : d
+    }
+    return result;
 }
 
 let listAvg = function(listIn, avgNumber, decimal) {
@@ -40,7 +57,7 @@ let listAvg = function(listIn, avgNumber, decimal) {
     let NaNCounter = 0;
     for (i in list) {
 
-        if(isNaN(list[i])){
+        if (isNaN(list[i])) {
             NaNCounter++
         } else {
             somma += list[i]
@@ -96,13 +113,13 @@ let popolateData = function(dati_covid, regione) {
 
     if (regione == '')
         rawData.nazionale = dati_covid
-        date = {
-            avg_1: dati_covid.map(a => new Date(a.data)),
-            avg_3: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 3 == 0),
-            avg_7: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 7 == 0),
-            avg_15: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 15 == 0),
-            avg_30: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 30 == 0),
-        }
+    date = {
+        avg_1: dati_covid.map(a => new Date(a.data)),
+        avg_3: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 3 == 0),
+        avg_7: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 7 == 0),
+        avg_15: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 15 == 0),
+        avg_30: dati_covid.map(a => new Date(a.data)).filter((a, index) => index % 30 == 0),
+    }
 
     let nuovi_positivi = dati_covid.map(a => a.nuovi_positivi)
     let ricoverati_con_sintomi = dati_covid.map(a => a.ricoverati_con_sintomi)
@@ -163,6 +180,46 @@ let addToDataset = function(id, regione, title, list, link, decimal) {
 
 }
 
+const datiParsati = []
+let popolaVaccini = function(datiVaccini) {
+    rawData.vaccini = datiVaccini
+    const datiItalia = []
+
+    for (const i in codiciRegioni) {
+        let dati = datiVaccini.data.filter(d => d.area == codiciRegioni[i]).map(d => { return { data: d.data_somministrazione, vaccini: d.totale } })
+        let regione = regioni[i]
+        datiParsati.push({ regione, dati })
+        dati.forEach(d => {
+            if (datiItalia.find(di => di.data == d.data))
+                datiItalia.find(di => di.data == d.data).vaccini += d.vaccini
+            else
+                datiItalia.push({ data: d.data, vaccini: d.vaccini })
+        })
+    }
+
+    let d = normalizeDatiVaccini(datiItalia)
+    addToDataset('totale_vaccini', '', 'Totale Vaccini', giornalieroToTotale(d))
+    addToDataset('vaccini', '', 'Vaccini', d)
+
+    for (const dati of datiParsati) {
+        d = normalizeDatiVaccini(dati.dati)
+        addToDataset('totale_vaccini', dati.regione, 'Totale Vaccini', giornalieroToTotale(d))
+        addToDataset('vaccini', dati.regione, 'Vaccini', d)
+    }
+
+}
+
+let normalizeDatiVaccini = function(dati) {
+    const result = []
+    for (data of date.avg_1) {
+        if (dati.some(d => new Date(d.data).toDateString() == data.toDateString()))
+            result.push(dati.find(d => new Date(d.data).toDateString() == data.toDateString()).vaccini)
+        else
+            result.push(NaN)
+    }
+    return result
+}
+
 let date = {}
 
-let datasets = {}
+const datasets = {}

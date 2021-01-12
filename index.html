@@ -77,12 +77,13 @@
         <button type="button" class="btn btn-link btn-lg" onclick="lastDate()">--&gt;</button>
     </div>
     <div id="datiGiornalieri">
-        <div class="h5 text-center" id="totaliOggi"></div>
-        <div class="h5 text-center" id="infettiOggi"></div>
-        <div class="h5 text-center" id="guaritiOggi"></div>
-        <div class="h5 text-center" id="mortiOggi"></div>
-        <div class="h5 text-center" id="tamponiOggi"></div>
-        <div class="h5 text-center" id="rateoTamponiInfettiOggi"></div>
+        <div class="h5 text-center" id="totale_positivi_oggi"></div>
+        <div class="h5 text-center" id="nuovi_positivi_oggi"></div>
+        <div class="h5 text-center" id="totale_vaccini_oggi"></div>
+        <div class="h5 text-center" id="dimessi_guariti_oggi"></div>
+        <div class="h5 text-center" id="deceduti_oggi"></div>
+        <div class="h5 text-center" id="tamponi_oggi"></div>
+        <div class="h5 text-center" id="rateo_tamponi_nuovi_positivi_oggi"></div>
     </div>
     <div class="row mt-5" style=" font-size: 18px;">
         <div class="col-md-3" id="checkboxDatasets0" style="margin-left: 2%;"></div>
@@ -147,8 +148,9 @@
     </div>
 
     <footer class="page-footer font-small blue">
-        <div class="footer-copyright text-center py-3">Dati forniti dal
-            <a href="https://github.com/pcm-dpc/COVID-19" target="_blank"> ministero della salute</a>
+        <div class="footer-copyright text-center py-3">Dati forniti dal Ministero della Salute
+            <sup><a href="https://github.com/pcm-dpc/COVID-19" target="_blank">[1]</a></sup>
+            <sup><a href="https://github.com/italia/covid19-opendata-vaccini" target="_blank">[2]</a></sup>
         </div>
     </footer>
 

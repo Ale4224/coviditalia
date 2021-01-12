@@ -92,41 +92,30 @@ let giorniData = 0
 let setDateData = function() {
 
     let dataAggiornamento = date.avg_1[date.avg_1.length - 1 - giorniData]
-    let infettiOggi = getNumberFromDataset('nuovi_positivi', giorniData)
-    let guaritiOggi = getNumberFromDataset('dimessi_guariti', giorniData)
-    let mortiOggi = getNumberFromDataset('deceduti', giorniData)
-    let tamponiOggi = getNumberFromDataset('tamponi', giorniData)
-    let rateoTamponiInfettiOggi = getNumberFromDataset('rateo_tamponi_nuovi_positivi', giorniData)
-    let totaliOggi = getNumberFromDataset('totale_positivi', giorniData)
-
-    let infettiIeri = getNumberFromDataset('nuovi_positivi', giorniData + 1)
-    let guaritiIeri = getNumberFromDataset('dimessi_guariti', giorniData + 1)
-    let mortiIeri = getNumberFromDataset('deceduti', giorniData + 1)
-    let tamponiIeri = getNumberFromDataset('tamponi', giorniData + 1)
-    let rateoTamponiInfettiIeri = getNumberFromDataset('rateo_tamponi_nuovi_positivi', giorniData + 1)
-    let totaliIeri = getNumberFromDataset('totale_positivi', giorniData + 1)
-
-    let infettiDiff = infettiOggi - infettiIeri
-    let guaritiDiff = guaritiOggi - guaritiIeri
-    let mortiDiff = mortiOggi - mortiIeri
-    let tamponiDiff = tamponiOggi - tamponiIeri
-    let rateoTamponiInfettiDiff = rateoTamponiInfettiOggi - rateoTamponiInfettiIeri
-    let totaliDiff = totaliOggi - totaliIeri
 
     $('#dataAggiornamento').html(dataAggiornamento.toLocaleDateString())
 
-    renderData('#infettiOggi', 'Nuovi infetti: +', infettiOggi, infettiDiff, false)
-    renderData('#guaritiOggi', 'Nuovi guariti: +', guaritiOggi, guaritiDiff, true)
-    renderData('#totaliOggi', 'Totale positivi ad oggi: +', totaliOggi, totaliDiff, false)
-    renderData('#mortiOggi', 'Nuovi decessi: +', mortiOggi, mortiDiff, false)
-    renderData('#tamponiOggi', 'Nuovi tamponi effettuati: +', tamponiOggi, tamponiDiff, true)
-    renderData('#rateoTamponiInfettiOggi', 'Rateo infetti per 1000 tamponi: +', rateoTamponiInfettiOggi, rateoTamponiInfettiDiff, false)
+    //renderData('nuovi_positivi', 'Nuovi infetti: +', false)
+    //renderData('dimessi_guariti', 'Nuovi guariti: +', true)
+    renderData('totale_positivi', 'Totale positivi ad oggi: +', false)
+        //renderData('deceduti', 'Nuovi decessi: +', false)
+        //renderData('tamponi', 'Nuovi tamponi effettuati: +', true)
+    renderData('rateo_tamponi_nuovi_positivi', 'Rateo infetti per 1000 tamponi: +', false)
+    renderData('totale_vaccini', 'Totale vaccini: +', true)
 }
 
-let renderData = function(id, descr, numOggi, numDiff, isHighGood) {
+let renderData = function(id, descr, isHighGood) {
+
+    let numOggi = getNumberFromDataset(id, giorniData)
+    let numIeri = getNumberFromDataset(id, giorniData + 1)
+    let numDiff = numOggi - numIeri
 
     if (isNaN(numDiff))
         numDiff = 0
+    if (isNaN(numOggi))
+        numOggi = 0
+    if (isNaN(numIeri))
+        numIeri = 0
 
     let isPos = numDiff > 0
     let isNeg = numDiff < 0
@@ -134,8 +123,7 @@ let renderData = function(id, descr, numOggi, numDiff, isHighGood) {
 
     let color = isZero ? 'grey' : isPos != isHighGood ? 'red' : isNeg != isHighGood ? 'green' : 'grey'
     let sign = isPos ? '+' : isNeg ? '-' : '+'
-
-    $(id).html(descr + numOggi.toLocaleString() + ' <span style="font-size: 16px;color:' + color + ';">(' + sign + Math.abs(numDiff).toLocaleString() + ' rispetto a ieri)</span>')
+    $('#' + id + '_oggi').html(descr + numOggi.toLocaleString() + ' <span style="font-size: 16px;color:' + color + ';">(' + sign + Math.abs(numDiff).toLocaleString() + ' rispetto a ieri)</span>')
 }
 
 let previousDate = function() {
