@@ -219,7 +219,10 @@ window.onload = function() {
     getData().then(() => {
         setDateData()
         renderFiltri()
+        $('#loading').toggle()
+        $('#loaded').toggle()
         $('#nuovi_positivi').click()
+        $('#lastUpdateVaccini').text("Ultimo aggiornamento conteggio vaccini: " + lastUpdateVaccini.toLocaleString())
     })
 }
 

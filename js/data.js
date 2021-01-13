@@ -7,6 +7,7 @@ let getData = async function() {
     let urlRegioni = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-regioni.json'
     let urlItalia = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json'
     let urlVaccini = 'https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/dati/somministrazioni-vaccini-summary-latest.json'
+    let urlLastUpdateVaccini = 'https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/dati/last-update-dataset.json'
     await Promise.all([fetch(urlItalia)
         .then(response => response.json())
         .then(json => popolateData(json, ''))
@@ -16,11 +17,15 @@ let getData = async function() {
         .then(popolateDataRegione)
         .catch(error => console.error(error))
     ])
-    await
-    fetch(urlVaccini)
+    await Promise.all([fetch(urlVaccini)
         .then(response => response.json())
         .then(json => popolaVaccini(json))
+        .catch(error => console.error(error)),
+        fetch(urlLastUpdateVaccini)
+        .then(response => response.json())
+        .then(j => lastUpdateVaccini = new Date(j.ultimo_aggiornamento))
         .catch(error => console.error(error))
+    ])
 }
 
 let totaleToGiornaliero = function(list, ignoreNaN) {
@@ -43,8 +48,9 @@ let giornalieroToTotale = function(list) {
     const result = []
     let sum = 0
     for (d of list) {
-        result.push(d + sum)
-        sum += isNaN(d) ? 0 : d
+        let dd = isNaN(d) ? 0 : d
+        result.push(dd + sum)
+        sum += dd
     }
     return result;
 }
@@ -219,6 +225,8 @@ let normalizeDatiVaccini = function(dati) {
     }
     return result
 }
+
+let lastUpdateVaccini
 
 let date = {}
 

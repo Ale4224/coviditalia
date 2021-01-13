@@ -68,83 +68,93 @@
 
 <body style="height: 100%;">
     <div class="h1 text-center">Dati COVID-19 ITALIA</div>
-    <div class="h3 text-center">
-        <button type="button" class="btn btn-link btn-lg" onclick="firstDate()">&lt;--</button>
-        <button type="button" class="btn btn-link btn-lg" onclick="previousDate()">&lt;-</button> <span id="dataAggiornamento">
-                ###DATA###
-            </span>
-        <button type="button" class="btn btn-link btn-lg" onclick="nextDate()">-&gt;</button>
-        <button type="button" class="btn btn-link btn-lg" onclick="lastDate()">--&gt;</button>
-    </div>
-    <div id="datiGiornalieri">
-        <div class="h5 text-center" id="totale_positivi_oggi"></div>
-        <div class="h5 text-center" id="nuovi_positivi_oggi"></div>
-        <div class="h5 text-center" id="totale_vaccini_oggi"></div>
-        <div class="h5 text-center" id="dimessi_guariti_oggi"></div>
-        <div class="h5 text-center" id="deceduti_oggi"></div>
-        <div class="h5 text-center" id="tamponi_oggi"></div>
-        <div class="h5 text-center" id="rateo_tamponi_nuovi_positivi_oggi"></div>
-    </div>
-    <div class="row mt-5" style=" font-size: 18px;">
-        <div class="col-md-3" id="checkboxDatasets0" style="margin-left: 2%;"></div>
-        <div class="col-md-3" id="checkboxDatasets1"></div>
-        <div class="col-md-1">
-            <input type="radio" id="avg_1" value="avg_1" name="avg" onchange="onChangeCheckboxAvg()" checked="true">
-            <label for="avg_1">Avg 1</label>
-            <br>
 
-            <input type="radio" id="avg_3" value="avg_3" name="avg" onchange="onChangeCheckboxAvg()">
-            <label for="avg_3">Avg 3</label>
-            <br>
-
-            <input type="radio" id="avg_7" value="avg_7" name="avg" onchange="onChangeCheckboxAvg()">
-            <label for="avg_7">Avg 7</label>
-            <br>
-
-            <input type="radio" id="avg_15" value="avg_15" name="avg" onchange="onChangeCheckboxAvg()">
-            <label for="avg_15">Avg 15</label>
-            <br>
-
-            <input type="radio" id="avg_30" value="avg_30" name="avg" onchange="onChangeCheckboxAvg()">
-            <label for="avg_30">Avg 30</label>
-            <br>
-        </div>
-        <div class="col-md-2">
-
-            <input type="radio" id="allDate" value="allDate" name="dates" onchange="changeDateRange('all')" checked="true">
-            <label for="allDate">Tutte le date</label>
-            <br>
-
-            <input type="radio" id="last8month" value="last8month" name="dates" onchange="changeDateRange(8)">
-            <label for="last8month">8 mesi</label>
-            <br>
-
-            <input type="radio" id="last6month" value="last6month" name="dates" onchange="changeDateRange(6)">
-            <label for="last6month">6 mesi</label>
-            <br>
-
-            <input type="radio" id="last4month" value="last4month" name="dates" onchange="changeDateRange(4)">
-            <label for="last4month">4 mesi</label>
-            <br>
-
-            <input type="radio" id="last2month" value="last2month" name="dates" onchange="changeDateRange(2)">
-            <label for="last2month">2 mesi</label>
-            <br>
-
-            <input type="radio" id="last1month" value="last1month" name="dates" onchange="changeDateRange(1)">
-            <label for="last1month">1 mese</label>
-            <br>
-        </div>
-        <div class="col-md-2">
-            <label for="regioni">Regioni</label>
-            <select name="regioni" id="regioni" onchange="renderFromList()">
-                    <option value="" selected>Tutte</option>
-                </select>
+    <div class="text-center justify-content-center" id="loading">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
         </div>
     </div>
 
-    <div class="row" style="height: 75%;">
-        <div class="col-md-10 offset-sm-1" id="chartContainer" style="height: 700px;"></div>
+    <div id="loaded" style="display: none;">
+        <div class="h6 text-center" id="lastUpdateVaccini"></div>
+        <div class="h3 text-center">
+            <button type="button" class="btn btn-link btn-lg" onclick="firstDate()">&lt;--</button>
+            <button type="button" class="btn btn-link btn-lg" onclick="previousDate()">&lt;-</button> <span id="dataAggiornamento">
+            ###DATA###
+        </span>
+            <button type="button" class="btn btn-link btn-lg" onclick="nextDate()">-&gt;</button>
+            <button type="button" class="btn btn-link btn-lg" onclick="lastDate()">--&gt;</button>
+        </div>
+        <div id="datiGiornalieri">
+            <div class="h5 text-center" id="totale_positivi_oggi"></div>
+            <div class="h5 text-center" id="nuovi_positivi_oggi"></div>
+            <div class="h5 text-center" id="totale_vaccini_oggi"></div>
+            <div class="h5 text-center" id="dimessi_guariti_oggi"></div>
+            <div class="h5 text-center" id="deceduti_oggi"></div>
+            <div class="h5 text-center" id="tamponi_oggi"></div>
+            <div class="h5 text-center" id="rateo_tamponi_nuovi_positivi_oggi"></div>
+        </div>
+        <div class="row mt-5" style=" font-size: 18px;">
+            <div class="col-md-3" id="checkboxDatasets0" style="margin-left: 2%;"></div>
+            <div class="col-md-3" id="checkboxDatasets1"></div>
+            <div class="col-md-1">
+                <input type="radio" id="avg_1" value="avg_1" name="avg" onchange="onChangeCheckboxAvg()" checked="true">
+                <label for="avg_1">Avg 1</label>
+                <br>
+
+                <input type="radio" id="avg_3" value="avg_3" name="avg" onchange="onChangeCheckboxAvg()">
+                <label for="avg_3">Avg 3</label>
+                <br>
+
+                <input type="radio" id="avg_7" value="avg_7" name="avg" onchange="onChangeCheckboxAvg()">
+                <label for="avg_7">Avg 7</label>
+                <br>
+
+                <input type="radio" id="avg_15" value="avg_15" name="avg" onchange="onChangeCheckboxAvg()">
+                <label for="avg_15">Avg 15</label>
+                <br>
+
+                <input type="radio" id="avg_30" value="avg_30" name="avg" onchange="onChangeCheckboxAvg()">
+                <label for="avg_30">Avg 30</label>
+                <br>
+            </div>
+            <div class="col-md-2">
+
+                <input type="radio" id="allDate" value="allDate" name="dates" onchange="changeDateRange('all')" checked="true">
+                <label for="allDate">Tutte le date</label>
+                <br>
+
+                <input type="radio" id="last8month" value="last8month" name="dates" onchange="changeDateRange(8)">
+                <label for="last8month">8 mesi</label>
+                <br>
+
+                <input type="radio" id="last6month" value="last6month" name="dates" onchange="changeDateRange(6)">
+                <label for="last6month">6 mesi</label>
+                <br>
+
+                <input type="radio" id="last4month" value="last4month" name="dates" onchange="changeDateRange(4)">
+                <label for="last4month">4 mesi</label>
+                <br>
+
+                <input type="radio" id="last2month" value="last2month" name="dates" onchange="changeDateRange(2)">
+                <label for="last2month">2 mesi</label>
+                <br>
+
+                <input type="radio" id="last1month" value="last1month" name="dates" onchange="changeDateRange(1)">
+                <label for="last1month">1 mese</label>
+                <br>
+            </div>
+            <div class="col-md-2">
+                <label for="regioni">Regioni</label>
+                <select name="regioni" id="regioni" onchange="renderFromList()">
+                <option value="" selected>Tutte</option>
+            </select>
+            </div>
+        </div>
+
+        <div class="row" style="height: 75%;">
+            <div class="col-md-10 offset-sm-1" id="chartContainer" style="height: 700px;"></div>
+        </div>
     </div>
 
     <footer class="page-footer font-small blue">
