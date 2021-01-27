@@ -117,16 +117,17 @@ let calcoloRT = function(lista_infetti) {
 
 let popolateData = function(dati_covid, regione) {
 
-    if (regione == ''){
-
+    if (regione == '')
         rawData.nazionale = dati_covid
-        date = {
-            avg_1: dati_covid.map(a => new Date(a.data)),
-            avg_3: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 3 == 0),
-            avg_7: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 7 == 0),
-            avg_15: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 15 == 0),
-            avg_30: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 30 == 0),
-        }
+    
+    dati_covid = dati_covid.filter((v,i,a)=>a.findIndex(t=>(t.data === v.data))===i)
+
+    date = date || {
+        avg_1: dati_covid.map(a => new Date(a.data)),
+        avg_3: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 3 == 0),
+        avg_7: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 7 == 0),
+        avg_15: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 15 == 0),
+        avg_30: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 30 == 0),
     }
 
     let nuovi_positivi = dati_covid.map(a => a.nuovi_positivi)
@@ -230,6 +231,6 @@ let normalizeDatiVaccini = function(dati) {
 
 let lastUpdateVaccini
 
-let date = {}
+let date
 
 const datasets = {}
