@@ -215,13 +215,12 @@ window.onload = function () {
         $('#loaded').toggle()
         $('#lastUpdateVaccini').text("Ultimo aggiornamento conteggio vaccini: " + lastUpdateVaccini.toLocaleString())
         handleQueryParams()
-        $('#shareLink').val(window.location.href)
     })
 }
 
 let setLocation = function(){
 
-    let queryString = '?'
+    let queryString = location.pathname + '?'
 
     
     let selected = [
@@ -245,13 +244,11 @@ let setLocation = function(){
             .filter(x => x != 'allDate')
             .forEach(x => queryString += "id=" + x + "&");
     
-    if(queryString.endsWith('&'))
-        queryString = queryString.slice(0, -1)
-    if(queryString == '?regione=&id=nuovi_positivi' || selected.length == 0 || regioniSelezionate.length == 0)
+    if(queryString == '?regione=&id=nuovi_positivi&' || selected.length == 0 || regioniSelezionate.length == 0)
         queryString = '/'
 
     history.replaceState(null, 'Covid Italia', queryString);
-    $('#shareLink').val(window.location.href)
+    $('#shareLink').val(window.location.href.replace("https://", "").replace("http://", "").slice(0, -1))
 }
 
 let clickShareLink = function(el){
