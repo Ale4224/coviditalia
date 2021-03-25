@@ -145,8 +145,10 @@ let lastDate = function () {
 let multiSelectConfig = {
     keepOrder: true,
     afterSelect: function (value) {
-        sendEvent('region_select_' + value[0], 'region_select', value[0] + ' selected')
-        regioniSelezionate.push(value[0])
+        value.forEach(v =>{
+            sendEvent('region_select_' + value[0], 'region_select', v + ' selected')
+            regioniSelezionate.push(v)
+        })
         renderFromList()
     },
     afterDeselect: function (value) {
@@ -243,12 +245,8 @@ let setLocation = function(){
             .map(x => x.id)
             .filter(x => x != 'allDate')
             .forEach(x => queryString += "id=" + x + "&");
-    
-    if(queryString == '?regione=&id=nuovi_positivi&' || selected.length == 0 || regioniSelezionate.length == 0)
-        queryString = '/'
 
-    history.replaceState(null, 'Covid Italia', location.pathname.slice(0, -1) + queryString);
-    $('#shareLink').val(window.location.href.replace("https://", "").replace("http://", "").slice(0, -1))
+    $('#shareLink').val(location.host + location.pathname + queryString)
 }
 
 let clickShareLink = function(el){
@@ -262,8 +260,7 @@ let handleQueryParams = function () {
     let regioni = []
     urlParams.forEach((value, key) => {
         if (key == 'id') {
-            $('#' + value).click()
-            //document.getElementById(value).onchange()
+            document.getElementById(value).checked = true
         } else if (key == 'regione') {
             regioni.push(value)
         }
@@ -274,11 +271,17 @@ let handleQueryParams = function () {
         ...[].slice.call(document.getElementById('checkboxDatasets1').children).filter(x => x.checked)
     ]
 
-    if (selected == 0)
-        $('#nuovi_positivi').click()
+    selected.map(x => x.id).forEach(x => listEnabled.push(x))
+
+    if (selected == 0) {
+        document.getElementById('nuovi_positivi').checked = true
+        listEnabled.push('nuovi_positivi')
+    }
     if(regioni.length > 0){
         $('#regioni').multiSelect('deselect', '')
-        regioni.forEach(r => $('#regioni').multiSelect('select', r))
+        $('#regioni').multiSelect('select', regioni)
+    } else {
+        renderFromList()
     }
 }
 
