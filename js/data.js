@@ -1,6 +1,8 @@
 let regioni = ["Abruzzo", "Basilicata", "Calabria", "Campania", "Emilia-Romagna", "Friuli Venezia Giulia", "Lazio", "Liguria", "Lombardia", "Marche", "Molise", "P.A. Bolzano", "P.A. Trento", "Piemonte", "Puglia", "Sardegna", "Sicilia", "Toscana", "Umbria", "Valle d'Aosta", "Veneto"]
 let codiciRegioni = ["ABR", "BAS", "CAL", "CAM", "EMR", "FVG", "LAZ", "LIG", "LOM", "MAR", "MOL", "PAB", "PAT", "PIE", "PUG", "SAR", "SIC", "TOS", "UMB", "VDA", "VEN"]
 
+let regioni_abitanti = JSON.parse('{"":59641488,"Abruzzo":1293941,"Basilicata":553254,"Calabria":1894110,"Campania":5712143,"Emilia-Romagna":4464119,"Friuli Venezia Giulia":1206216,"Lazio":5755700,"Liguria":1524826,"Lombardia":10027602,"Marche":1512672,"Molise":300516,"P.A. Bolzano":532644,"P.A. Trento":545425,"Piemonte":4311217,"Puglia":3953305,"Sardegna":1611621,"Sicilia":4875290,"Toscana":3692555,"Umbria":870165,"Valle d\'Aosta":125034,"Veneto":4879133}')
+
 let rawData = {}
 
 let getData = async function() {
@@ -146,23 +148,31 @@ let popolateData = function(dati_covid, regione) {
 
     let rateo_tamponi_nuovi_positivi = rateoListe(nuovi_positivi, tamponi, 1000)
 
+    let abitanti = new Array(totale_positivi.length).fill(regioni_abitanti[regione])
+    let rateo_totale_positivi_abitanti = rateoListe(totale_positivi, abitanti, 10000)
+    let rateo_tamponi_abitanti = rateoListe(tamponi, abitanti, 10000)
+
     let variazione_nuovi_positivi = totaleToGiornaliero(nuovi_positivi, true)
 
     let calcolo_r_t = calcoloRT(nuovi_positivi)
 
     addToDataset('nuovi_positivi', regione, 'Nuovi positivi', nuovi_positivi)
+    addToDataset('totale_positivi', regione, 'Totale positivi', totale_positivi)
+    addToDataset('rateo_tamponi_nuovi_positivi', regione, 'Nuovi positivi per 1.000 tamponi', rateo_tamponi_nuovi_positivi)
+    addToDataset('rateo_totale_positivi_abitanti', regione, 'Totale positivi per 10.000 abitanti', rateo_totale_positivi_abitanti)
     addToDataset('tamponi', regione, 'Tamponi', tamponi)
-    addToDataset('rateo_tamponi_nuovi_positivi', regione, 'Nuovi positivi per mille tamponi', rateo_tamponi_nuovi_positivi)
-    addToDataset('deceduti', regione, 'Deceduti', deceduti)
+    addToDataset('totale_tamponi', regione, 'Totale Tamponi', totale_tamponi)
+    addToDataset('rateo_tamponi_abitanti', regione, 'Nuovi tamponi per 10.000 abitanti', rateo_tamponi_abitanti)
     addToDataset('variazione_nuovi_positivi', regione, 'Variazione nuovi positivi', variazione_nuovi_positivi)
+    addToDataset('deceduti', regione, 'Deceduti', deceduti)
+    addToDataset('totale_deceduti', regione, 'Totale deceduti', totale_deceduti)
+    addToDataset('totale_casi', regione, 'Totale casi', totale_casi)
     addToDataset('ricoverati_con_sintomi', regione, 'Ricoverati con sintomi', ricoverati_con_sintomi)
     addToDataset('terapia_intensiva', regione, 'Terapia intensiva', terapia_intensiva)
     addToDataset('ospedalizzati', regione, 'Ospedalizzati', totale_ospedalizzati)
     addToDataset('dimessi_guariti', regione, 'Guariti', dimessi_guariti)
-    addToDataset('totale_casi', regione, 'Totale casi', totale_casi)
-    addToDataset('totale_positivi', regione, 'Totale positivi', totale_positivi)
-    addToDataset('totale_deceduti', regione, 'Totale deceduti', totale_deceduti)
     addToDataset('calcolo_r_t', regione, 'Calcolo Rt (beta)', calcolo_r_t, 'https://it.wikipedia.org/wiki/Numero_di_riproduzione_di_base#Numero_di_riproduzione_netto_al_tempo_t', 2)
+    
 }
 
 let addToDataset = function(id, regione, title, list, link, decimal) {
@@ -206,16 +216,22 @@ let popolaVaccini = function(datiVaccini) {
         })
     }
 
-    let d = normalizeDatiVaccini(datiItalia)
-    addToDataset('totale_vaccini', '', 'Totale Vaccini', giornalieroToTotale(d))
-    addToDataset('vaccini', '', 'Vaccini', d)
+    addVacciniToDataset(datiItalia, '')
 
     for (const dati of datiParsati) {
-        d = normalizeDatiVaccini(dati.dati)
-        addToDataset('totale_vaccini', dati.regione, 'Totale Vaccini', giornalieroToTotale(d))
-        addToDataset('vaccini', dati.regione, 'Vaccini', d)
+        addVacciniToDataset(dati.dati, dati.regione)
     }
 
+}
+
+let addVacciniToDataset = function(dati, regione){
+    let d = normalizeDatiVaccini(dati)
+    let totale_vaccini = giornalieroToTotale(d)
+    let abitanti = new Array(totale_vaccini.length).fill(regioni_abitanti[regione])
+    let rateo_totale_vaccini_abitanti = rateoListe(totale_vaccini, abitanti, 10000)
+    addToDataset('vaccini', regione, 'Vaccini', d)
+    addToDataset('totale_vaccini', regione, 'Totale Vaccini', totale_vaccini)
+    addToDataset('rateo_totale_vaccini_abitanti', regione, 'Totale vaccini per 10.000 abitanti', rateo_totale_vaccini_abitanti)
 }
 
 let normalizeDatiVaccini = function(dati) {
