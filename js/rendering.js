@@ -220,7 +220,7 @@ window.onload = function () {
 
 let setLocation = function(){
 
-    let queryString = location.pathname + '?'
+    let queryString = '?'
 
     
     let selected = [
@@ -248,7 +248,7 @@ let setLocation = function(){
         queryString = '/'
 
     history.replaceState(null, 'Covid Italia', queryString);
-    $('#shareLink').val(window.location.href.replace("https://", "").replace("http://", "").slice(0, -1))
+    $('#shareLink').val(location.pathname + window.location.href.replace("https://", "").replace("http://", "").slice(0, -1))
 }
 
 let clickShareLink = function(el){
