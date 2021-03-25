@@ -158,7 +158,8 @@ let multiSelectConfig = {
     },
 }
 
-let changeDateRange = function (range) {
+let changeDateRange = function () {
+    let range = [].slice.call(document.getElementsByName('dates'), 0).filter(x => x.checked)[0].value
     sendEvent('date_range_click_' + range, 'date_range_click', range + ' clicked')
 
     maxRange = date[avgType][date[avgType].length - 1]
@@ -246,7 +247,7 @@ let setLocation = function(){
             .filter(x => x != 'allDate')
             .forEach(x => queryString += "id=" + x + "&");
 
-    $('#shareLink').val(location.host + location.pathname + queryString)
+    $('#shareLink').val(encodeURI(location.host + location.pathname + queryString))
 }
 
 let clickShareLink = function(el){
@@ -280,9 +281,9 @@ let handleQueryParams = function () {
     if(regioni.length > 0){
         $('#regioni').multiSelect('deselect', '')
         $('#regioni').multiSelect('select', regioni)
-    } else {
-        renderFromList()
     }
+    changeDateRange()
+    onChangeCheckboxAvg()
 }
 
 let regioniSelezionate = [''];
