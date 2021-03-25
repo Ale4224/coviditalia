@@ -247,7 +247,7 @@ let setLocation = function(){
     if(queryString == '?regione=&id=nuovi_positivi&' || selected.length == 0 || regioniSelezionate.length == 0)
         queryString = '/'
 
-    history.replaceState(null, 'Covid Italia', location.pathname + queryString);
+    history.replaceState(null, 'Covid Italia', location.pathname.slice(0, -1) + queryString);
     $('#shareLink').val(window.location.href.replace("https://", "").replace("http://", "").slice(0, -1))
 }
 
