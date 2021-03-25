@@ -4,7 +4,7 @@ let avgType = 'avg_1'
 let minRange = null
 let maxRange = null
 
-let generateDataPoints = function(list, date) {
+let generateDataPoints = function (list, date) {
     let l = []
 
     for (i in list) {
@@ -16,7 +16,7 @@ let generateDataPoints = function(list, date) {
     return l
 }
 
-let addDataToChart = function(index, title, list, date) {
+let addDataToChart = function (index, title, list, date) {
     chart.options.axisY.push({
         title: title,
         titleFontSize: 20,
@@ -30,13 +30,13 @@ let addDataToChart = function(index, title, list, date) {
         dataPoints: generateDataPoints(list, date),
     })
 }
-let addDataToChartByRegione = function(index, id, regione, avgType) {
+let addDataToChartByRegione = function (index, id, regione, avgType) {
     addDataToChart(index, datasets[id].regioni[regione].title, datasets[id].regioni[regione][avgType], date[avgType])
 }
-let addDataToChartItalia = function(index, id, avgType) {
+let addDataToChartItalia = function (index, id, avgType) {
     addDataToChart(index, datasets[id].title, datasets[id][avgType], date[avgType])
 }
-let renderFromList = function() {
+let renderFromList = function () {
     chart.options.axisY = []
     chart.options.data = []
 
@@ -61,35 +61,26 @@ let renderFromList = function() {
     chart.options.axisX = { viewportMinimum, viewportMaximum }
 
     chart.render()
+    setLocation()
 }
 
-let addDataset = function(id) {
-    listEnabled.push(id)
+
+let onChangeCheckbox = function (id) {
+    listEnabled = [
+        ...[].slice.call(document.getElementById('checkboxDatasets0').children).filter(x => x.checked).map(x => x.id),
+        ...[].slice.call(document.getElementById('checkboxDatasets1').children).filter(x => x.checked).map(x => x.id)
+    ]
     renderFromList()
 }
-let removeDataset = function(id) {
-    listEnabled = listEnabled.filter(x => x != id)
-    renderFromList()
-}
 
-let onChangeCheckbox = function(id) {
-    if (document.getElementById(id).checked) {
-        sendEvent('checkbox_check_' + id, 'checkbox_check', id + ' checked')
-        addDataset(id)
-    } else {
-        sendEvent('checkbox_uncheck_' + id, 'checkbox_uncheck', id + ' unchecked')
-        removeDataset(id)
-    }
-}
-
-let onChangeCheckboxAvg = function() {
+let onChangeCheckboxAvg = function () {
     avgType = [].slice.call(document.getElementsByName('avg'), 0).filter(x => x.checked)[0].id
     sendEvent('checkbox_avg_click_' + avgType, 'checkbox_avg_click', avgType + ' clicked')
     renderFromList()
 }
 
 let giorniData = 0
-let setDateData = function() {
+let setDateData = function () {
 
     let dataAggiornamento = date.avg_1[date.avg_1.length - 1 - giorniData]
 
@@ -98,13 +89,13 @@ let setDateData = function() {
     //renderData('nuovi_positivi', 'Nuovi infetti: +', false)
     //renderData('dimessi_guariti', 'Nuovi guariti: +', true)
     renderData('totale_positivi', 'Totale positivi ad oggi: +', false)
-        //renderData('deceduti', 'Nuovi decessi: +', false)
-        //renderData('tamponi', 'Nuovi tamponi effettuati: +', true)
+    //renderData('deceduti', 'Nuovi decessi: +', false)
+    //renderData('tamponi', 'Nuovi tamponi effettuati: +', true)
     renderData('rateo_tamponi_nuovi_positivi', 'Rateo infetti per 1000 tamponi: +', false)
     renderData('totale_vaccini', 'Totale vaccini: +', true)
 }
 
-let renderData = function(id, descr, isHighGood) {
+let renderData = function (id, descr, isHighGood) {
 
     let numOggi = getNumberFromDataset(id, giorniData)
     let numIeri = getNumberFromDataset(id, giorniData + 1)
@@ -126,7 +117,7 @@ let renderData = function(id, descr, isHighGood) {
     $('#' + id + '_oggi').html(descr + numOggi.toLocaleString() + ' <span style="font-size: 16px;color:' + color + ';">(' + sign + Math.abs(numDiff).toLocaleString() + ' rispetto a ieri)</span>')
 }
 
-let previousDate = function() {
+let previousDate = function () {
     giorniData++
     if (giorniData > date.avg_1.length - 1) {
         giorniData--
@@ -134,7 +125,7 @@ let previousDate = function() {
     }
     setDateData()
 }
-let nextDate = function() {
+let nextDate = function () {
     giorniData--
     if (giorniData < 0) {
         giorniData++
@@ -142,30 +133,30 @@ let nextDate = function() {
     }
     setDateData()
 }
-let firstDate = function() {
+let firstDate = function () {
     giorniData = date.avg_1.length - 1
     setDateData()
 }
-let lastDate = function() {
+let lastDate = function () {
     giorniData = 0
     setDateData()
 }
 
 let multiSelectConfig = {
     keepOrder: true,
-    afterSelect: function(value) {
+    afterSelect: function (value) {
         sendEvent('region_select_' + value[0], 'region_select', value[0] + ' selected')
         regioniSelezionate.push(value[0])
         renderFromList()
     },
-    afterDeselect: function(value) {
+    afterDeselect: function (value) {
         sendEvent('region_deselect_' + value[0], 'region_deselect', value[0] + ' deselected')
         regioniSelezionate = regioniSelezionate.filter(e => e != value[0])
         renderFromList()
     },
 }
 
-let changeDateRange = function(range) {
+let changeDateRange = function (range) {
     sendEvent('date_range_click_' + range, 'date_range_click', range + ' clicked')
 
     maxRange = date[avgType][date[avgType].length - 1]
@@ -178,10 +169,10 @@ let changeDateRange = function(range) {
 }
 
 let chart
-window.onload = function() {
+window.onload = function () {
     chart = new CanvasJS.Chart("chartContainer", {
         zoomEnabled: true,
-        rangeChanging: function(e) {
+        rangeChanging: function (e) {
 
             if (e.trigger == 'reset') {
                 let element = Array.from(document.getElementsByName("dates")).filter(e => e.checked)[0]
@@ -215,36 +206,104 @@ window.onload = function() {
         $('#regioni').append(new Option(element, element));
     })
     $('#regioni').multiSelect(multiSelectConfig)
+    $('#shareLink').tooltip({title: "Clicca per copiare"})
 
     getData().then(() => {
         setDateData()
         renderFiltri()
         $('#loading').toggle()
         $('#loaded').toggle()
-        $('#nuovi_positivi').click()
         $('#lastUpdateVaccini').text("Ultimo aggiornamento conteggio vaccini: " + lastUpdateVaccini.toLocaleString())
+        handleQueryParams()
+        $('#shareLink').val(window.location.href)
     })
+}
+
+let setLocation = function(){
+
+    let queryString = '?'
+
+    
+    let selected = [
+        ...[].slice.call(document.getElementById('checkboxDatasets0').children).filter(x => x.checked).map(x => x.id),
+        ...[].slice.call(document.getElementById('checkboxDatasets1').children).filter(x => x.checked).map(x => x.id)
+    ]
+
+    regioniSelezionate.forEach(r => queryString += "regione=" + r + "&");
+    
+    selected.forEach(x => queryString += "id=" + x + "&");
+    
+    [].slice.call(document.getElementsByName('avg'), 0)
+        .filter(x => x.checked)
+        .map(x => x.id)
+        .filter(x => x != 'avg_1')
+        .forEach(x => queryString += "id=" + x + "&");
+
+    [].slice.call(document.getElementsByName('dates'), 0)
+            .filter(x => x.checked)
+            .map(x => x.id)
+            .filter(x => x != 'allDate')
+            .forEach(x => queryString += "id=" + x + "&");
+    
+    if(queryString.endsWith('&'))
+        queryString = queryString.slice(0, -1)
+    if(queryString == '?regione=&id=nuovi_positivi' || selected.length == 0 || regioniSelezionate.length == 0)
+        queryString = '/'
+
+    history.replaceState(null, 'Covid Italia', queryString);
+    $('#shareLink').val(window.location.href)
+}
+
+let clickShareLink = function(el){
+    el.select()
+    el.setSelectionRange(0, 99999)
+    document.execCommand("copy")
+}
+
+let handleQueryParams = function () {
+    const urlParams = new URLSearchParams(window.location.search)
+    let regioni = []
+    urlParams.forEach((value, key) => {
+        if (key == 'id') {
+            $('#' + value).click()
+            //document.getElementById(value).onchange()
+        } else if (key == 'regione') {
+            regioni.push(value)
+        }
+    })
+
+    let selected = [
+        ...[].slice.call(document.getElementById('checkboxDatasets0').children).filter(x => x.checked),
+        ...[].slice.call(document.getElementById('checkboxDatasets1').children).filter(x => x.checked)
+    ]
+
+    if (selected == 0)
+        $('#nuovi_positivi').click()
+    if(regioni.length > 0){
+        $('#regioni').multiSelect('deselect', '')
+        regioni.forEach(r => $('#regioni').multiSelect('select', r))
+    }
 }
 
 let regioniSelezionate = [''];
 
-let getNumberFromDataset = function(dataset, giorniData) {
+let getNumberFromDataset = function (dataset, giorniData) {
     return Number(datasets[dataset].avg_1[datasets[dataset].avg_1.length - 1 - giorniData])
 }
 
-let renderFiltri = function() {
+let renderFiltri = function () {
     if (categorizr.isMobile)
         renderFiltriDesktop()
-        //renderFiltriMobile()
+    //renderFiltriMobile()
     else
         renderFiltriDesktop()
 }
 
-let renderFiltriDesktop = function() {
+let renderFiltriDesktop = function () {
     Object.keys(datasets).forEach(renderCheckboxDesktop)
 }
 
-let renderCheckboxDesktop = function(dsName, index) {
+let renderCheckboxDesktop = function (dsName, index) {
     let ds = datasets[dsName]
     let link = ds.link ? ' [<a href="' + ds.link + '" target="_blank">info</a>]' : ''
     let htmlFiltro = `
@@ -255,6 +314,6 @@ let renderCheckboxDesktop = function(dsName, index) {
     $('#checkboxDatasets' + (index % 2)).append(htmlFiltro)
 }
 
-let renderFiltriMobile = function() {
+let renderFiltriMobile = function () {
 
 }
