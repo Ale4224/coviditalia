@@ -145,7 +145,7 @@ let lastDate = function () {
 let multiSelectConfig = {
     keepOrder: true,
     afterSelect: function (value) {
-        value.forEach(v =>{
+        value.forEach(v => {
             sendEvent('region_select_' + value[0], 'region_select', v + ' selected')
             regioniSelezionate.push(v)
         })
@@ -209,7 +209,7 @@ window.onload = function () {
         $('#regioni').append(new Option(element, element));
     })
     $('#regioni').multiSelect(multiSelectConfig)
-    $('#shareLink').tooltip({title: "Clicca per copiare"})
+    $('#shareLink').tooltip({ title: "Clicca per copiare" })
 
     getData().then(() => {
         setDateData()
@@ -221,20 +221,20 @@ window.onload = function () {
     })
 }
 
-let setLocation = function(){
+let setLocation = function () {
 
     let queryString = '?'
 
-    
+
     let selected = [
         ...[].slice.call(document.getElementById('checkboxDatasets0').children).filter(x => x.checked).map(x => x.id),
         ...[].slice.call(document.getElementById('checkboxDatasets1').children).filter(x => x.checked).map(x => x.id)
     ]
 
     regioniSelezionate.forEach(r => queryString += "regione=" + r + "&");
-    
+
     selected.forEach(x => queryString += "id=" + x + "&");
-    
+
     [].slice.call(document.getElementsByName('avg'), 0)
         .filter(x => x.checked)
         .map(x => x.id)
@@ -242,15 +242,15 @@ let setLocation = function(){
         .forEach(x => queryString += "id=" + x + "&");
 
     [].slice.call(document.getElementsByName('dates'), 0)
-            .filter(x => x.checked)
-            .map(x => x.id)
-            .filter(x => x != 'allDate')
-            .forEach(x => queryString += "id=" + x + "&");
+        .filter(x => x.checked)
+        .map(x => x.id)
+        .filter(x => x != 'allDate')
+        .forEach(x => queryString += "id=" + x + "&");
 
-    $('#shareLink').val(encodeURI(location.host + location.pathname + queryString))
+    $('#shareLink').val(encodeURI(location.origin + location.pathname + queryString))
 }
 
-let clickShareLink = function(el){
+let clickShareLink = function (el) {
     el.select()
     el.setSelectionRange(0, 99999)
     document.execCommand("copy")
@@ -278,7 +278,7 @@ let handleQueryParams = function () {
         document.getElementById('nuovi_positivi').checked = true
         listEnabled.push('nuovi_positivi')
     }
-    if(regioni.length > 0){
+    if (regioni.length > 0) {
         $('#regioni').multiSelect('deselect', '')
         $('#regioni').multiSelect('select', regioni)
     }
