@@ -1,13 +1,15 @@
 let listEnabled = []
 
-let avgType = 'avg_1'
+let avgValue = 1
 let minRange = null
 let maxRange = null
+
+let mousewheelevt = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel"
 
 let generateDataPoints = function (list, date) {
     let l = []
 
-    for (i in list) {
+    for (let i = 0; i < list.length; i++) {
         l.push({
             y: list[i],
             label: date[i].toLocaleDateString(),
@@ -30,11 +32,11 @@ let addDataToChart = function (index, title, list, date) {
         dataPoints: generateDataPoints(list, date),
     })
 }
-let addDataToChartByRegione = function (index, id, regione, avgType) {
-    addDataToChart(index, datasets[id].regioni[regione].title, datasets[id].regioni[regione][avgType], date[avgType])
+let addDataToChartByRegione = function (index, id, regione) {
+    addDataToChart(index, datasets[id].regioni[regione].title, datasets[id].regioni[regione].getAvg(avgValue, giorniData), date.getAvg(avgValue, giorniData))
 }
-let addDataToChartItalia = function (index, id, avgType) {
-    addDataToChart(index, datasets[id].title, datasets[id][avgType], date[avgType])
+let addDataToChartItalia = function (index, id) {
+    addDataToChart(index, datasets[id].title, datasets[id].getAvg(avgValue, giorniData), date.getAvg(avgValue, giorniData))
 }
 let renderFromList = function () {
     chart.options.axisY = []
@@ -44,19 +46,20 @@ let renderFromList = function () {
         let id = listEnabled[i]
         regioniSelezionate.forEach(regione => {
             if (regione == '')
-                addDataToChartItalia(i, id, avgType)
+                addDataToChartItalia(i, id)
             else
-                addDataToChartByRegione(i, id, regione, avgType)
+                addDataToChartByRegione(i, id, regione)
         })
     }
 
+    let lsitaDate = date.getAvg(avgValue, giorniData)
     let viewportMinimum = 0
     if (minRange)
-        viewportMinimum = date[avgType].filter(d => d < minRange).length - 1
+        viewportMinimum = lsitaDate.filter(d => d < minRange).length - 1
 
-    let viewportMaximum = date[avgType].length - 1
+    let viewportMaximum = lsitaDate.length - 1
     if (maxRange)
-        viewportMaximum = date[avgType].filter(d => d <= maxRange).length - 1
+        viewportMaximum = lsitaDate.filter(d => d <= maxRange).length - 1
 
     chart.options.axisX = { viewportMinimum, viewportMaximum }
 
@@ -74,8 +77,9 @@ let onChangeCheckbox = function (id) {
 }
 
 let onChangeCheckboxAvg = function () {
-    avgType = [].slice.call(document.getElementsByName('avg'), 0).filter(x => x.checked)[0].id
+    let avgType = [].slice.call(document.getElementsByName('avg'), 0).filter(x => x.checked)[0].id
     sendEvent('checkbox_avg_click_' + avgType, 'checkbox_avg_click', avgType + ' clicked')
+    avgValue = Number(avgType.replace("avg_", ''))
     renderFromList()
 }
 
@@ -123,7 +127,9 @@ let previousDate = function () {
         giorniData--
         return
     }
+    $('#rangeSlider').val(giorniData * -1)
     setDateData()
+    changeDateRange()
 }
 let nextDate = function () {
     giorniData--
@@ -131,15 +137,21 @@ let nextDate = function () {
         giorniData++
         return
     }
+    $('#rangeSlider').val(giorniData * -1)
     setDateData()
+    changeDateRange()
 }
 let firstDate = function () {
     giorniData = date.avg_1.length - 1
+    $('#rangeSlider').val(giorniData * -1)
     setDateData()
+    changeDateRange()
 }
 let lastDate = function () {
     giorniData = 0
+    $('#rangeSlider').val(giorniData * -1)
     setDateData()
+    changeDateRange()
 }
 
 let multiSelectConfig = {
@@ -158,15 +170,25 @@ let multiSelectConfig = {
     },
 }
 
+let onInputRange = function (value) {
+    giorniData = Math.abs(value)
+    setDateData()
+    changeDateRange()
+}
+
 let changeDateRange = function () {
     let range = [].slice.call(document.getElementsByName('dates'), 0).filter(x => x.checked)[0].value
     sendEvent('date_range_click_' + range, 'date_range_click', range + ' clicked')
 
-    maxRange = date[avgType][date[avgType].length - 1]
+    maxRange = date.getAvg(avgValue, giorniData).slice(-1)[0]
     if (range == 'all')
         minRange = 0
-    else
-        minRange = moment().subtract(range, 'months')
+    else {
+        minRange = moment(maxRange).subtract(range, 'months')
+        if (minRange < date.avg_1[0])
+            minRange = 0
+    }
+
 
     renderFromList()
 }
@@ -186,8 +208,8 @@ window.onload = function () {
             let minIndex = parseInt(e.axisX[0].viewportMinimum)
             let maxIndex = parseInt(e.axisX[0].viewportMaximum)
 
-            minRange = date[avgType][minIndex]
-            maxRange = date[avgType][maxIndex]
+            minRange = date.avg_1[minIndex]
+            maxRange = date.avg_1[maxIndex]
         },
         toolTip: {
             shared: true
@@ -218,7 +240,65 @@ window.onload = function () {
         $('#loaded').toggle()
         $('#lastUpdateVaccini').text("Ultimo aggiornamento conteggio vaccini: " + lastUpdateVaccini.toLocaleString())
         handleQueryParams()
+        let slide = $('#rangeSlider')
+        slide.attr('max', 0)
+        slide.attr('min', date.avg_1.length * -1 + 1)
+        slide.val(0)
+        slide.on('mouseover', function () {
+            slide.bind(mousewheelevt, moveSlider)
+        })
     })
+}
+let moveSlider = function (e) {
+    e.preventDefault()
+    let slide = $('#rangeSlider')
+    let value = slide.val()
+    console.log(value)
+    if (e.originalEvent.wheelDelta < 0)
+        slide.val(value - 1)
+    else
+        slide.val(Number(value) + 1);
+
+    slide.trigger('input')
+}
+
+let interval
+let playDate = function (e) {
+    e.preventDefault()
+    if (interval) {
+        clearInterval(interval)
+        interval = undefined
+    }
+    let slide = $('#rangeSlider')
+    interval = setInterval(() => {
+        let value = Number(slide.val())
+        if (value + 1 < 0)
+            slide.val(value + 1)
+        else
+            slide.val(slide.attr('min'))
+        slide.trigger('input')
+    }, 100)
+}
+let fastDate = function (e) {
+    e.preventDefault()
+    if (interval) {
+        clearInterval(interval)
+        interval = undefined
+    }
+    let slide = $('#rangeSlider')
+    interval = setInterval(() => {
+        let value = Number(slide.val())
+        if (value + 1 < 0)
+            slide.val(value + 1)
+        else
+            slide.val(slide.attr('min'))
+        slide.trigger('input')
+    }, 10)
+}
+let pauseDate = function (e) {
+    e.preventDefault()
+    clearInterval(interval)
+    interval = undefined
 }
 
 let setLocation = function () {

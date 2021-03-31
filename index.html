@@ -57,8 +57,8 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        
-         ::-webkit-scrollbar {
+
+        ::-webkit-scrollbar {
             width: 0px;
             background: transparent;
         }
@@ -80,8 +80,8 @@
         <div class="h3 text-center">
             <button type="button" class="btn btn-link btn-lg" onclick="firstDate()">&lt;--</button>
             <button type="button" class="btn btn-link btn-lg" onclick="previousDate()">&lt;-</button> <span id="dataAggiornamento">
-            ###DATA###
-        </span>
+                ###DATA###
+            </span>
             <button type="button" class="btn btn-link btn-lg" onclick="nextDate()">-&gt;</button>
             <button type="button" class="btn btn-link btn-lg" onclick="lastDate()">--&gt;</button>
         </div>
@@ -147,13 +147,38 @@
             <div class="col-md-2">
                 <label for="regioni">Regioni</label>
                 <select name="regioni" id="regioni" onchange="renderFromList()">
-                <option value="" selected>Tutte</option>
-            </select>
+                    <option value="" selected>Tutte</option>
+                </select>
             </div>
         </div>
 
         <div class="row" style="height: 75%;">
             <div class="col-md-10 offset-sm-1" id="chartContainer" style="height: 700px;"></div>
+        </div>
+        <div class="row">
+            <div class="offset-md-4 col-md-4">
+                <input type="range" id="rangeSlider" style="width: 100%;margin-top: 17px;" oninput="onInputRange(this.value)">
+            </div>
+            <div class="col-md-4">
+                <a href="#" onclick="playDate(event)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#0075ff" viewBox="0 0 16 16">
+                        <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z" />
+                    </svg>
+                </a>
+                <a href="#" onclick="fastDate(event)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#0075ff" viewBox="0 0 16 16">
+                        <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#0075ff" viewBox="0 0 16 16" style="margin-left: -30px;">
+                        <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z" />
+                    </svg>
+                </a>
+                <a href="#" onclick="pauseDate(event)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#0075ff" viewBox="0 0 16 16">
+                        <path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z" />
+                    </svg>
+                </a>
+            </div>
         </div>
         <div class="row" style="height: 75%;">
             <div class="col-md-10 offset-sm-1" id="share">
