@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html style="height: 100%;">
+<html>
 
 <head>
 
@@ -35,16 +35,14 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="./css/multi-select.css">
+    <link rel="stylesheet" href="./css/jquery.multiselect.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js" integrity="sha512-LGXaggshOkD/at6PFNcp2V2unf9LzFq6LE+sChH7ceMTDP0g2kn6Vxwgg7wkPP7AAtX+lmPqPdxB47A0Nz0cMQ==" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.quicksearch/2.4.0/jquery.quicksearch.min.js" integrity="sha512-EftvELo+CRsl6dER2p2FfP6JnueIg2g4i9zz3P42S5eTrtMLybcJ7D4+Sk9BlztI6sGutndC2vx2Pd4FcjgDhQ==" crossorigin="anonymous"></script>
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-    <script src="./js/lib/jquery.multi-select.js"></script>
-    <script src="./js/lib/categorizr.js"></script>
+    <script src="./js/lib/jquery.multiselect.js"></script>
     <script src="./js/lib/lib-r-math.js"></script>
     <script src="./js/data.js"></script>
     <script src="./js/rendering.js"></script>
@@ -76,7 +74,6 @@
     </div>
 
     <div id="loaded" style="display: none;">
-        <div class="h6 text-center" id="lastUpdateVaccini"></div>
         <div class="h3 text-center">
             <button type="button" class="btn btn-link btn-lg" onclick="firstDate()">&lt;--</button>
             <button type="button" class="btn btn-link btn-lg" onclick="previousDate()">&lt;-</button> <span id="dataAggiornamento">
@@ -95,9 +92,23 @@
             <div class="h5 text-center" id="rateo_tamponi_nuovi_positivi_oggi"></div>
         </div>
         <div class="row mt-5" style=" font-size: 18px;">
-            <div class="col-md-3" id="checkboxDatasets0" style="margin-left: 2%;"></div>
-            <div class="col-md-3" id="checkboxDatasets1"></div>
-            <div class="col-md-1">
+            <div class="offset-md-1 col-md-4">
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <label for="checkboxDatasets">Dati</label>
+                        <select name="checkboxDatasets" id="checkboxDatasets" multiple></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="regioni">Regioni</label>
+                        <select name="regioni" id="regioni" multiple>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="offset-md-1 col-md-2">
                 <input type="radio" id="avg_1" value="avg_1" name="avg" onchange="onChangeCheckboxAvg()" checked="true">
                 <label for="avg_1">Avg 1</label>
                 <br>
@@ -145,15 +156,13 @@
                 <br>
             </div>
             <div class="col-md-2">
-                <label for="regioni">Regioni</label>
-                <select name="regioni" id="regioni" onchange="renderFromList()">
-                    <option value="" selected>Tutte</option>
-                </select>
+                <input type="checkbox" id="sameScale" name="sameScale" onchange="renderFromList()">
+                <label for="sameScale">Stessa scala</label>
             </div>
         </div>
 
         <div class="row" style="height: 75%;">
-            <div class="col-md-10 offset-sm-1" id="chartContainer" style="height: 700px;"></div>
+            <div class="col-md-10 offset-md-1" id="chartContainer" style="height: 700px;"></div>
         </div>
         <div class="row">
             <div class="offset-md-4 col-md-4">

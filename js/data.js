@@ -9,7 +9,6 @@ let getData = async function () {
     let urlRegioni = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-regioni.json'
     let urlItalia = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json'
     let urlVaccini = 'https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/dati/somministrazioni-vaccini-summary-latest.json'
-    let urlLastUpdateVaccini = 'https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/dati/last-update-dataset.json'
     await Promise.all([fetch(urlItalia)
         .then(response => response.json())
         .then(json => popolateData(json, ''))
@@ -22,10 +21,6 @@ let getData = async function () {
     await Promise.all([fetch(urlVaccini)
         .then(response => response.json())
         .then(json => popolaVaccini(json))
-        .catch(error => console.error(error)),
-    fetch(urlLastUpdateVaccini)
-        .then(response => response.json())
-        .then(j => lastUpdateVaccini = new Date(j.ultimo_aggiornamento))
         .catch(error => console.error(error))
     ])
 }
@@ -180,7 +175,7 @@ let popolateData = function (dati_covid, regione) {
     addToDataset('terapia_intensiva', regione, 'Terapia intensiva', terapia_intensiva)
     addToDataset('ospedalizzati', regione, 'Ospedalizzati', totale_ospedalizzati)
     addToDataset('dimessi_guariti', regione, 'Guariti', dimessi_guariti)
-    addToDataset('calcolo_r_t', regione, 'Calcolo Rt (beta)', calcolo_r_t, 'https://it.wikipedia.org/wiki/Numero_di_riproduzione_di_base#Numero_di_riproduzione_netto_al_tempo_t', 2)
+    addToDataset('calcolo_r_t', regione, 'Calcolo Rt', calcolo_r_t, 'https://it.wikipedia.org/wiki/Numero_di_riproduzione_di_base#Numero_di_riproduzione_netto_al_tempo_t', 2)
 
 }
 
@@ -254,8 +249,6 @@ let normalizeDatiVaccini = function (dati) {
     }
     return result
 }
-
-let lastUpdateVaccini
 
 let date
 
