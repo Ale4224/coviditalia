@@ -312,6 +312,9 @@ let setLocation = function () {
         .filter(x => x != 'allDate')
         .forEach(x => queryString += "dates=" + x + "&");
 
+    if(document.querySelector('#sameScale').checked)
+        queryString += "scale=sameScale"
+
     $('#shareLink').val(encodeURI(location.origin + location.pathname + queryString))
 }
 
@@ -329,7 +332,7 @@ let handleQueryParams = function () {
             $('#checkboxDatasets[multiple]').multiselect('select', value)
         } else if (key == 'regione') {
             regioni.push(value)
-        } else if (key == 'avg' || key == 'dates') {
+        } else if (key == 'avg' || key == 'dates' || key == 'scale') {
             document.getElementById(value).checked = true
         }
     })
