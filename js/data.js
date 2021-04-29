@@ -231,10 +231,12 @@ let popolaVaccini = function (datiVaccini) {
 
 let addVacciniToDataset = function (dati, regione) {
     let d = normalizeDatiVaccini(dati)
+    let abitanti = new Array(d.length).fill(regioni_abitanti[regione])
+    let rateo_vaccini_abitanti = rateoListe(d, abitanti, 10000)
     let totale_vaccini = giornalieroToTotale(d)
-    let abitanti = new Array(totale_vaccini.length).fill(regioni_abitanti[regione])
     let rateo_totale_vaccini_abitanti = rateoListe(totale_vaccini, abitanti, 10000)
     addToDataset('vaccini', regione, 'Vaccini', d)
+    addToDataset('rateo_vaccini_abitanti', regione, 'Vaccini per 10.000 abitanti', rateo_vaccini_abitanti)
     addToDataset('totale_vaccini', regione, 'Totale Vaccini', totale_vaccini)
     addToDataset('rateo_totale_vaccini_abitanti', regione, 'Totale vaccini per 10.000 abitanti', rateo_totale_vaccini_abitanti)
 }
