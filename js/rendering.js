@@ -89,7 +89,7 @@ let setDateData = function () {
     //renderData('deceduti', 'Nuovi decessi: +', false)
     //renderData('tamponi', 'Nuovi tamponi effettuati: +', true)
     renderData('rateo_tamponi_nuovi_positivi', 'Rateo infetti per 1000 tamponi: +', false)
-    renderData('totale_vaccini', 'Totale vaccini: +', true)
+    renderData('totale_vaccini_seconda_dose', 'Totale vaccini seconda dose: +', true)
 }
 
 let renderData = function (id, descr, isHighGood) {
@@ -171,6 +171,9 @@ let changeDateRange = function () {
 
 let chart
 window.onload = function () {
+    if (!navigator.share)
+        $("#sharePng").toggle()
+
     chart = new CanvasJS.Chart("chartContainer", {
         zoomEnabled: true,
         rangeChanging: function (e) {
@@ -207,7 +210,7 @@ window.onload = function () {
     regioni.forEach(element => $('#regioni').append(new Option(element, element)))
     $('#regioni[multiple]').multiselect({
         columns: 2,
-        maxPlaceholderOpts: 18,
+        maxPlaceholderOpts: 8,
         onOptionClick: (() => {
             regioniSelezionate = $('#regioni[multiple]').multiselect('getValues')
             renderFromList()
@@ -312,7 +315,7 @@ let setLocation = function () {
         .filter(x => x != 'allDate')
         .forEach(x => queryString += "dates=" + x + "&");
 
-    if(document.querySelector('#sameScale').checked)
+    if (document.querySelector('#sameScale').checked)
         queryString += "scale=sameScale"
 
     $('#shareLink').val(encodeURI(location.origin + location.pathname + queryString))
@@ -361,3 +364,37 @@ let regioniSelezionate = [''];
 let getNumberFromDataset = function (dataset, giorniData) {
     return Number(datasets[dataset].avg_1[datasets[dataset].avg_1.length - 1 - giorniData])
 }
+
+let sharePng = function () {
+    if (navigator.share) {
+        let originalWidth = chart.width
+        let originalHeight = chart.height
+
+        chart.set("width", max(screen.width, screen.height))
+        chart.set("height", min(screen.width, screen.height))
+
+        let dataurl = document.querySelector("canvas").toDataURL('png')
+
+        fetch(dataurl)
+        .then((res) => res.blob())
+        .then((blob) => new File([blob], "covid_italia_chart.png", {type: blob.type}))
+        .then(file => {
+            let filesArray = [file]
+            navigator.share({
+                files: filesArray,
+                title: "covid_italia_chart.png",
+                text: "Covid Italia Chart " + location.href,
+            })
+            .finally(() => {
+                chart.set("width", originalWidth)
+                chart.set("height", originalHeight)
+            })
+            .catch((error) => console.log('Sharing failed', error))
+        })
+    } else {
+        alert(`Your system doesn't support sharing files.`)
+    }
+}
+
+let max = (a, b) => a > b ? a : b
+let min = (a, b) => a < b ? a : b

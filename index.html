@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="it">
 
 <head>
 
@@ -32,6 +32,10 @@
     <link rel="apple-touch-icon" href="img/icons/icon-512x512.png" />
     <meta name="apple-mobile-web-app-status-bar" content="#db4938" />
     <meta name="theme-color" content="#db4938" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.5">
+    <meta name="description" content="Grafici Covid19 Italia">
+
+
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
@@ -85,30 +89,31 @@
         <div id="datiGiornalieri">
             <div class="h5 text-center" id="totale_positivi_oggi"></div>
             <div class="h5 text-center" id="nuovi_positivi_oggi"></div>
-            <div class="h5 text-center" id="totale_vaccini_oggi"></div>
+            <div class="h5 text-center" id="totale_vaccini_seconda_dose_oggi"></div>
             <div class="h5 text-center" id="dimessi_guariti_oggi"></div>
             <div class="h5 text-center" id="deceduti_oggi"></div>
             <div class="h5 text-center" id="tamponi_oggi"></div>
             <div class="h5 text-center" id="rateo_tamponi_nuovi_positivi_oggi"></div>
         </div>
         <div class="row mt-5" style=" font-size: 18px;">
-            <div class="offset-md-1 col-md-4">
+            <div class="col-md-5">
                 <div class="row">
-                    <div class="col-md-12">
-
+                    <div class="offset-md-1 col-md-11">
                         <label for="checkboxDatasets">Dati</label>
-                        <select name="checkboxDatasets" id="checkboxDatasets" multiple></select>
+                        <select name="checkboxDatasets" id="checkboxDatasets" multiple>
+                        </select>
                     </div>
                 </div>
+                <br>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="offset-md-1 col-md-11">
                         <label for="regioni">Regioni</label>
                         <select name="regioni" id="regioni" multiple>
                         </select>
                     </div>
                 </div>
             </div>
-            <div class="offset-md-1 col-md-2">
+            <div class="col-md-2">
                 <input type="radio" id="avg_1" value="avg_1" name="avg" onchange="onChangeCheckboxAvg()" checked="true">
                 <label for="avg_1">Avg 1</label>
                 <br>
@@ -129,40 +134,43 @@
                 <label for="avg_30">Avg 30</label>
                 <br>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-5">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="radio" id="allDate" value="all" name="dates" onchange="changeDateRange()" checked="true">
+                        <label for="allDate">Tutte le date</label>
+                        <br>
 
-                <input type="radio" id="allDate" value="all" name="dates" onchange="changeDateRange()" checked="true">
-                <label for="allDate">Tutte le date</label>
-                <br>
+                        <input type="radio" id="last8month" value="8" name="dates" onchange="changeDateRange()">
+                        <label for="last8month">8 mesi</label>
+                        <br>
 
-                <input type="radio" id="last8month" value="8" name="dates" onchange="changeDateRange()">
-                <label for="last8month">8 mesi</label>
-                <br>
+                        <input type="radio" id="last6month" value="6" name="dates" onchange="changeDateRange()">
+                        <label for="last6month">6 mesi</label>
+                        <br>
 
-                <input type="radio" id="last6month" value="6" name="dates" onchange="changeDateRange()">
-                <label for="last6month">6 mesi</label>
-                <br>
+                        <input type="radio" id="last4month" value="4" name="dates" onchange="changeDateRange()">
+                        <label for="last4month">4 mesi</label>
+                        <br>
 
-                <input type="radio" id="last4month" value="4" name="dates" onchange="changeDateRange()">
-                <label for="last4month">4 mesi</label>
-                <br>
+                        <input type="radio" id="last2month" value="2" name="dates" onchange="changeDateRange()">
+                        <label for="last2month">2 mesi</label>
+                        <br>
 
-                <input type="radio" id="last2month" value="2" name="dates" onchange="changeDateRange()">
-                <label for="last2month">2 mesi</label>
-                <br>
-
-                <input type="radio" id="last1month" value="1" name="dates" onchange="changeDateRange()">
-                <label for="last1month">1 mese</label>
-                <br>
-            </div>
-            <div class="col-md-2">
-                <input type="checkbox" id="sameScale" name="sameScale" onchange="renderFromList()">
-                <label for="sameScale">Stessa scala</label>
+                        <input type="radio" id="last1month" value="1" name="dates" onchange="changeDateRange()">
+                        <label for="last1month">1 mese</label>
+                        <br>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="checkbox" id="sameScale" name="sameScale" onchange="renderFromList()">
+                        <label for="sameScale">Stessa scala</label>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="row" style="height: 75%;">
-            <div class="col-md-10 offset-md-1" id="chartContainer" style="height: 700px;"></div>
+        <div class="row" style="height: 75%; margin-left: 2%;margin-right: 2%;">
+            <div class="col-md-12"id="chartContainer" style="height: 700px;"></div>
         </div>
         <div class="row">
             <div class="offset-md-4 col-md-4">
@@ -193,6 +201,13 @@
             <div class="col-md-10 offset-sm-1" id="share">
                 <label for="sharelink">Condividi settaggi</label>
                 <input type="text" name="shareLink" id="shareLink" style="width: 100%;" onclick="clickShareLink(this)">
+            </div>
+        </div>
+        <br>
+        <div class="row" style="height: 75%;" id="sharePng">
+            <div class="col-md-10 offset-sm-1">
+                <label for="sharelink">Condividi immagine</label>
+                <button class="btn btn-primary" onclick="sharePng()">Share</button>
             </div>
         </div>
     </div>

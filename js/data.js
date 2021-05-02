@@ -210,14 +210,16 @@ let popolaVaccini = function (datiVaccini) {
     const datiItalia = []
 
     for (const i in codiciRegioni) {
-        let dati = datiVaccini.data.filter(d => d.area == codiciRegioni[i]).map(d => { return { data: d.data_somministrazione, vaccini: d.totale } })
+        let dati = datiVaccini.data.filter(d => d.area == codiciRegioni[i]).map(d => { return { data: d.data_somministrazione, prima_dose: d.prima_dose, seconda_dose: d.seconda_dose } })
         let regione = regioni[i]
         datiParsati.push({ regione, dati })
         dati.forEach(d => {
-            if (datiItalia.find(di => di.data == d.data))
-                datiItalia.find(di => di.data == d.data).vaccini += d.vaccini
+            if (datiItalia.find(di => di.data == d.data)){
+                datiItalia.find(di => di.data == d.data).prima_dose += d.prima_dose
+                datiItalia.find(di => di.data == d.data).seconda_dose += d.seconda_dose
+            }
             else
-                datiItalia.push({ data: d.data, vaccini: d.vaccini })
+                datiItalia.push({ data: d.data, prima_dose: d.prima_dose, seconda_dose: d.seconda_dose })
         })
     }
 
@@ -230,22 +232,31 @@ let popolaVaccini = function (datiVaccini) {
 }
 
 let addVacciniToDataset = function (dati, regione) {
-    let d = normalizeDatiVaccini(dati)
-    let abitanti = new Array(d.length).fill(regioni_abitanti[regione])
-    let rateo_vaccini_abitanti = rateoListe(d, abitanti, 10000)
-    let totale_vaccini = giornalieroToTotale(d)
-    let rateo_totale_vaccini_abitanti = rateoListe(totale_vaccini, abitanti, 10000)
-    addToDataset('vaccini', regione, 'Vaccini', d)
-    addToDataset('rateo_vaccini_abitanti', regione, 'Vaccini per 10.000 abitanti', rateo_vaccini_abitanti)
-    addToDataset('totale_vaccini', regione, 'Totale Vaccini', totale_vaccini)
-    addToDataset('rateo_totale_vaccini_abitanti', regione, 'Totale vaccini per 10.000 abitanti', rateo_totale_vaccini_abitanti)
+    let vaccini_prima_dose = normalizeDatiVaccini(dati, 'prima_dose')
+    let abitanti = new Array(vaccini_prima_dose.length).fill(regioni_abitanti[regione])
+    let rateo_vaccini_prima_dose_abitanti = rateoListe(vaccini_prima_dose, abitanti, 10000)
+    let totale_vaccini_prima_dose = giornalieroToTotale(vaccini_prima_dose)
+    let rateo_totale_vaccini_prima_dose_abitanti = rateoListe(totale_vaccini_prima_dose, abitanti, 10000)
+    addToDataset('vaccini_prima_dose', regione, 'Vaccini prima dose', vaccini_prima_dose)
+    addToDataset('rateo_vaccini_prima_dose_abitanti', regione, 'Vaccini prima dose per 10.000 abitanti', rateo_vaccini_prima_dose_abitanti)
+    addToDataset('totale_vaccini_prima_dose', regione, 'Totale Vaccini prima dose', totale_vaccini_prima_dose)
+    addToDataset('rateo_totale_vaccini_prima_dose_abitanti', regione, 'Totale vaccini prima dose per 10.000 abitanti', rateo_totale_vaccini_prima_dose_abitanti)
+
+    let vaccini_seconda_dose = normalizeDatiVaccini(dati, 'seconda_dose')
+    let rateo_vaccini_seconda_dose_abitanti = rateoListe(vaccini_seconda_dose, abitanti, 10000)
+    let totale_vaccini_seconda_dose = giornalieroToTotale(vaccini_seconda_dose)
+    let rateo_totale_vaccini_seconda_dose_abitanti = rateoListe(totale_vaccini_seconda_dose, abitanti, 10000)
+    addToDataset('vaccini_seconda_dose', regione, 'Vaccini seconda dose', vaccini_seconda_dose)
+    addToDataset('rateo_vaccini_seconda_dose_abitanti', regione, 'Vaccini seconda dose per 10.000 abitanti', rateo_vaccini_seconda_dose_abitanti)
+    addToDataset('totale_vaccini_seconda_dose', regione, 'Totale Vaccini seconda dose', totale_vaccini_seconda_dose)
+    addToDataset('rateo_totale_vaccini_seconda_dose_abitanti', regione, 'Totale vaccini seconda dose per 10.000 abitanti', rateo_totale_vaccini_seconda_dose_abitanti)
 }
 
-let normalizeDatiVaccini = function (dati) {
+let normalizeDatiVaccini = function (dati, dose) {
     const result = []
     for (data of date.avg_1) {
         if (dati.some(d => new Date(d.data).toDateString() == data.toDateString()))
-            result.push(dati.find(d => new Date(d.data).toDateString() == data.toDateString()).vaccini)
+            result.push(dati.find(d => new Date(d.data).toDateString() == data.toDateString())[dose])
         else
             result.push(NaN)
     }

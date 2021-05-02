@@ -1,9 +1,10 @@
 {
     "name": "Covid Italia",
     "short_name": "CovidItalia",
+    "description": "Grafici Covid19 Italia",
     "theme_color": "#fff",
     "background_color": "#fff",
-    "display": "browser",
+    "display": "standalone",
     "orientation": "portrait",
     "scope": "/coviditalia",
     "start_url": "/coviditalia",
