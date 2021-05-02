@@ -332,10 +332,10 @@ let setLocation = function () {
         .forEach(x => queryString += "dates=" + x + "&");
 
     if (document.querySelector('#sameScale').checked)
-        queryString += "scale=sameScale"
+        queryString += "scale=sameScale" + "&"
 
     if (document.querySelector('#rateoAbitanti').checked)
-            queryString += "rateo=rateoAbitanti"
+            queryString += "rateo=rateoAbitanti" + "&"
 
     $('#shareLink').val(encodeURI(location.origin + location.pathname + queryString))
 }
