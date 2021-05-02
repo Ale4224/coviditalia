@@ -33,10 +33,26 @@ let addDataToChart = function (index, title, list, date) {
     })
 }
 let addDataToChartByRegione = function (index, id, regione) {
-    addDataToChart(index, datasets[id].regioni[regione].title, datasets[id].regioni[regione].getAvg(avgValue, giorniData), date.getAvg(avgValue, giorniData))
+    let list
+    let title = datasets[id].regioni[regione].title
+    if (document.querySelector("#rateoAbitanti").checked){
+        list = datasets[id].regioni[regione].getRateoAbitanti(avgValue, giorniData)
+        title += " % abitanti"
+    } else {
+        list = datasets[id].regioni[regione].getAvg(avgValue, giorniData)
+    }
+    addDataToChart(index, title, list, date.getAvg(avgValue, giorniData))
 }
 let addDataToChartItalia = function (index, id) {
-    addDataToChart(index, datasets[id].title, datasets[id].getAvg(avgValue, giorniData), date.getAvg(avgValue, giorniData))
+    let list;
+    let title = datasets[id].title
+    if (document.querySelector("#rateoAbitanti").checked){
+        list = datasets[id].getRateoAbitanti(avgValue, giorniData)
+        title += " % abitanti"
+    } else{
+        list = datasets[id].getAvg(avgValue, giorniData)
+    }
+    addDataToChart(index, title, list, date.getAvg(avgValue, giorniData))
 }
 let renderFromList = function () {
     chart.options.axisY = []
@@ -318,6 +334,9 @@ let setLocation = function () {
     if (document.querySelector('#sameScale').checked)
         queryString += "scale=sameScale"
 
+    if (document.querySelector('#rateoAbitanti').checked)
+            queryString += "rateo=rateoAbitanti"
+
     $('#shareLink').val(encodeURI(location.origin + location.pathname + queryString))
 }
 
@@ -335,7 +354,7 @@ let handleQueryParams = function () {
             $('#checkboxDatasets[multiple]').multiselect('select', value)
         } else if (key == 'regione') {
             regioni.push(value)
-        } else if (key == 'avg' || key == 'dates' || key == 'scale') {
+        } else if (['avg', 'dates', 'scale', 'rateo'].includes(key)) {
             document.getElementById(value).checked = true
         }
     })

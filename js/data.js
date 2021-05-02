@@ -86,8 +86,8 @@ let listAvg = function (listIn, avgNumber, decimal, limit) {
     return l.map(x => Number(x.toFixed(decimal))).reverse()
 }
 
-let rateoListe = function (list1, list2, scale) {
-    return list1.map((e, i) => parseInt((e / list2[i]) * scale))
+let rateoListe = function (list1, list2, scale, decimal) {
+    return list1.map((e, i) => Number(((e / list2[i]) * scale).toFixed(decimal)))
 }
 let popolateDataRegione = function (dati_covid) {
     for (const r of regioni) {
@@ -117,18 +117,14 @@ let calcoloRT = function (lista_infetti) {
 }
 
 let popolateData = function (dati_covid, regione) {
-
     if (regione == '')
         rawData.nazionale = dati_covid
 
     dati_covid = dati_covid.filter((v, i, a) => a.findIndex(t => (t.data === v.data)) === i)
 
     date = date || {
+        str: dati_covid.map(a => new Date(a.data).toLocaleDateString()),
         avg_1: dati_covid.map(a => new Date(a.data)),
-        //avg_3: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 3 == 0),
-        //avg_7: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 7 == 0),
-        //avg_15: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 15 == 0),
-        //avg_30: dati_covid.map(a => new Date(a.data)).filter((_, index) => index % 30 == 0),
         getAvg: (avg, limit) => dati_covid.map(a => new Date(a.data))
             .reverse()
             .filter((_, i) => i >= (limit || 0))
@@ -152,10 +148,6 @@ let popolateData = function (dati_covid, regione) {
 
     let rateo_tamponi_nuovi_positivi = rateoListe(nuovi_positivi, tamponi, 1000)
 
-    let abitanti = new Array(totale_positivi.length).fill(regioni_abitanti[regione])
-    let rateo_totale_positivi_abitanti = rateoListe(totale_positivi, abitanti, 10000)
-    let rateo_tamponi_abitanti = rateoListe(tamponi, abitanti, 10000)
-
     let variazione_nuovi_positivi = totaleToGiornaliero(nuovi_positivi, true)
 
     let calcolo_r_t = calcoloRT(nuovi_positivi)
@@ -163,10 +155,8 @@ let popolateData = function (dati_covid, regione) {
     addToDataset('nuovi_positivi', regione, 'Nuovi positivi', nuovi_positivi)
     addToDataset('totale_positivi', regione, 'Totale positivi', totale_positivi)
     addToDataset('rateo_tamponi_nuovi_positivi', regione, 'Nuovi positivi per 1.000 tamponi', rateo_tamponi_nuovi_positivi)
-    addToDataset('rateo_totale_positivi_abitanti', regione, 'Totale positivi per 10.000 abitanti', rateo_totale_positivi_abitanti)
     addToDataset('tamponi', regione, 'Tamponi', tamponi)
     addToDataset('totale_tamponi', regione, 'Totale Tamponi', totale_tamponi)
-    addToDataset('rateo_tamponi_abitanti', regione, 'Nuovi tamponi per 10.000 abitanti', rateo_tamponi_abitanti)
     addToDataset('variazione_nuovi_positivi', regione, 'Variazione nuovi positivi', variazione_nuovi_positivi)
     addToDataset('deceduti', regione, 'Deceduti', deceduti)
     addToDataset('totale_deceduti', regione, 'Totale deceduti', totale_deceduti)
@@ -176,7 +166,6 @@ let popolateData = function (dati_covid, regione) {
     addToDataset('ospedalizzati', regione, 'Ospedalizzati', totale_ospedalizzati)
     addToDataset('dimessi_guariti', regione, 'Guariti', dimessi_guariti)
     addToDataset('calcolo_r_t', regione, 'Calcolo Rt', calcolo_r_t, 'https://it.wikipedia.org/wiki/Numero_di_riproduzione_di_base#Numero_di_riproduzione_netto_al_tempo_t', 2)
-
 }
 
 let addToDataset = function (id, regione, title, list, link, decimal) {
@@ -186,11 +175,12 @@ let addToDataset = function (id, regione, title, list, link, decimal) {
         id,
         link,
         avg_1: list,
-        //avg_3: listAvg(list, 3, decimal),
-        //avg_7: listAvg(list, 7, decimal),
-        //avg_15: listAvg(list, 15, decimal),
-        //avg_30: listAvg(list, 30, decimal),
         getAvg: (avg, limit) => (listAvg(list, avg, decimal, limit)),
+        getRateoAbitanti: (avg, limit) => {
+            let ret = listAvg(list, avg, decimal, limit)
+            ret = rateoListe(ret, new Array(ret.length).fill(regioni_abitanti[regione]), 100, 4)
+            return ret
+        },
     }
 
     if (regione == '') {
@@ -206,11 +196,14 @@ let addToDataset = function (id, regione, title, list, link, decimal) {
 
 const datiParsati = []
 let popolaVaccini = function (datiVaccini) {
-    rawData.vaccini = datiVaccini
-    const datiItalia = []
+    rawData.vaccini = datiVaccini.data
+    let datiItalia = []
 
     for (const i in codiciRegioni) {
-        let dati = datiVaccini.data.filter(d => d.area == codiciRegioni[i]).map(d => { return { data: d.data_somministrazione, prima_dose: d.prima_dose, seconda_dose: d.seconda_dose } })
+        let dati = datiVaccini.data
+            .filter(d => d.area == codiciRegioni[i])
+            .map(d => { return { data: d.data_somministrazione, prima_dose: d.prima_dose, seconda_dose: d.seconda_dose } })
+            .sort((a, b) => a.data.localeCompare(b.data))
         let regione = regioni[i]
         datiParsati.push({ regione, dati })
         dati.forEach(d => {
@@ -222,44 +215,36 @@ let popolaVaccini = function (datiVaccini) {
                 datiItalia.push({ data: d.data, prima_dose: d.prima_dose, seconda_dose: d.seconda_dose })
         })
     }
-
+    datiItalia = datiItalia.sort((a, b) => a.data.localeCompare(b.data))
     addVacciniToDataset(datiItalia, '')
 
     for (const dati of datiParsati) {
         addVacciniToDataset(dati.dati, dati.regione)
     }
-
 }
 
 let addVacciniToDataset = function (dati, regione) {
     let vaccini_prima_dose = normalizeDatiVaccini(dati, 'prima_dose')
-    let abitanti = new Array(vaccini_prima_dose.length).fill(regioni_abitanti[regione])
-    let rateo_vaccini_prima_dose_abitanti = rateoListe(vaccini_prima_dose, abitanti, 10000)
     let totale_vaccini_prima_dose = giornalieroToTotale(vaccini_prima_dose)
-    let rateo_totale_vaccini_prima_dose_abitanti = rateoListe(totale_vaccini_prima_dose, abitanti, 10000)
     addToDataset('vaccini_prima_dose', regione, 'Vaccini prima dose', vaccini_prima_dose)
-    addToDataset('rateo_vaccini_prima_dose_abitanti', regione, 'Vaccini prima dose per 10.000 abitanti', rateo_vaccini_prima_dose_abitanti)
     addToDataset('totale_vaccini_prima_dose', regione, 'Totale Vaccini prima dose', totale_vaccini_prima_dose)
-    addToDataset('rateo_totale_vaccini_prima_dose_abitanti', regione, 'Totale vaccini prima dose per 10.000 abitanti', rateo_totale_vaccini_prima_dose_abitanti)
 
     let vaccini_seconda_dose = normalizeDatiVaccini(dati, 'seconda_dose')
-    let rateo_vaccini_seconda_dose_abitanti = rateoListe(vaccini_seconda_dose, abitanti, 10000)
     let totale_vaccini_seconda_dose = giornalieroToTotale(vaccini_seconda_dose)
-    let rateo_totale_vaccini_seconda_dose_abitanti = rateoListe(totale_vaccini_seconda_dose, abitanti, 10000)
     addToDataset('vaccini_seconda_dose', regione, 'Vaccini seconda dose', vaccini_seconda_dose)
-    addToDataset('rateo_vaccini_seconda_dose_abitanti', regione, 'Vaccini seconda dose per 10.000 abitanti', rateo_vaccini_seconda_dose_abitanti)
     addToDataset('totale_vaccini_seconda_dose', regione, 'Totale Vaccini seconda dose', totale_vaccini_seconda_dose)
-    addToDataset('rateo_totale_vaccini_seconda_dose_abitanti', regione, 'Totale vaccini seconda dose per 10.000 abitanti', rateo_totale_vaccini_seconda_dose_abitanti)
 }
 
 let normalizeDatiVaccini = function (dati, dose) {
+    dati = [...dati]
     const result = []
-    for (data of date.avg_1) {
-        if (dati.some(d => new Date(d.data).toDateString() == data.toDateString()))
-            result.push(dati.find(d => new Date(d.data).toDateString() == data.toDateString())[dose])
+    for (data of date.str) {
+        if (dati[0] && data == new Date(dati[0].data).toLocaleDateString())
+            result.push(dati.shift()[dose])
         else
             result.push(NaN)
     }
+
     return result
 }
 
