@@ -383,7 +383,7 @@ let sharePng = function () {
             navigator.share({
                 files: filesArray,
                 title: "covid_italia_chart.png",
-                text: "Covid Italia Chart " + location.href,
+                text: "Covid Italia Chart " + $('#shareLink').val(),
             })
             .finally(() => {
                 chart.set("width", originalWidth)
