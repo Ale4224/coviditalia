@@ -8,11 +8,12 @@ let mousewheelevt = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : 
 
 let generateDataPoints = function (list, date) {
     let l = []
+    let byYear = document.querySelector("#byYear").checked
 
     for (let i = 0; i < list.length; i++) {
         l.push({
             y: list[i],
-            label: date[i].toLocaleDateString(),
+            label: byYear ? date[i].getDate() + '/' + (date[i].getMonth() + 1) : date[i].toLocaleDateString(),
         })
     }
     return l
@@ -32,51 +33,106 @@ let addDataToChart = function (index, title, list, date) {
         dataPoints: generateDataPoints(list, date),
     })
 }
-let addDataToChartByRegione = function (index, id, regione) {
+
+
+const getDatesByYear = (year, avg) => new Array(365)
+    .fill(0)
+    .map(_ => new Date(year, 0, 1))
+    .map((d, i) => {
+        if ((((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) && i >= 59) {
+            i++
+        }
+        d.setDate(d.getDate() + i)
+        return d
+    })
+    .reverse()
+    .filter((_, i) => i % avg == 0)
+    .reverse()
+
+let addDataToChartByRegione = function (id, regione) {
     let list
     let title = datasets[id].regioni[regione].title
-    if (document.querySelector("#rateoAbitanti").checked){
+    let byYear = document.querySelector("#byYear").checked
+    let rateoAbitanti = document.querySelector("#rateoAbitanti").checked
+    if (byYear) {
+        let lists;
+        if (rateoAbitanti)
+            lists = datasets[id].regioni[regione].getDataByYearRateoAbitanti(avgValue, giorniData)
+        else
+            lists = datasets[id].regioni[regione].getDataByYear(avgValue, giorniData)
+        for (let year of Object.keys(lists)) {
+            title = datasets[id].regioni[regione].title
+            title += " " + year
+            if (rateoAbitanti) title += " % abitanti"
+            addDataToChart(scaleIndex, title, lists[year], getDatesByYear(year, avgValue))
+            if (!$('#sameScale').prop('checked'))
+                scaleIndex++
+        }
+        return
+    }
+    if (rateoAbitanti) {
         list = datasets[id].regioni[regione].getRateoAbitanti(avgValue, giorniData)
         title += " % abitanti"
     } else {
         list = datasets[id].regioni[regione].getAvg(avgValue, giorniData)
     }
-    addDataToChart(index, title, list, date.getAvg(avgValue, giorniData))
+    addDataToChart(scaleIndex, title, list, date.getAvg(avgValue, giorniData))
 }
-let addDataToChartItalia = function (index, id) {
+let addDataToChartItalia = function (id) {
     let list;
     let title = datasets[id].title
-    if (document.querySelector("#rateoAbitanti").checked){
+
+    let byYear = document.querySelector("#byYear").checked
+    let rateoAbitanti = document.querySelector("#rateoAbitanti").checked
+    if (byYear) {
+        let lists;
+        if (rateoAbitanti)
+            lists = datasets[id].getDataByYearRateoAbitanti(avgValue, giorniData)
+        else
+            lists = datasets[id].getDataByYear(avgValue, giorniData)
+        for (let year of Object.keys(lists)) {
+            title = datasets[id].title
+            title += " " + year
+            if (rateoAbitanti) title += " % abitanti"
+            addDataToChart(scaleIndex, title, lists[year], getDatesByYear(year, avgValue))
+            if (!$('#sameScale').prop('checked'))
+                scaleIndex++
+        }
+        return
+    }
+    if (rateoAbitanti) {
         list = datasets[id].getRateoAbitanti(avgValue, giorniData)
         title += " % abitanti"
-    } else{
+    } else {
         list = datasets[id].getAvg(avgValue, giorniData)
     }
-    addDataToChart(index, title, list, date.getAvg(avgValue, giorniData))
+    addDataToChart(scaleIndex, title, list, date.getAvg(avgValue, giorniData))
 }
+let scaleIndex = 0
 let renderFromList = function () {
+    scaleIndex = 0
     chart.options.axisY = []
     chart.options.data = []
 
-    let i = 0
     for (let id of listEnabled) {
         regioniSelezionate.forEach(regione => {
             if (regione == '')
-                addDataToChartItalia(i, id)
+                addDataToChartItalia(id)
             else
-                addDataToChartByRegione(i, id, regione)
+                addDataToChartByRegione(id, regione)
             if (!$('#sameScale').prop('checked'))
-                i++
+                scaleIndex++
         })
     }
 
+    let byYear = document.querySelector("#byYear").checked
     let lsitaDate = date.getAvg(avgValue, giorniData)
     let viewportMinimum = 0
     if (minRange)
         viewportMinimum = lsitaDate.filter(d => d < minRange).length - 1
 
-    let viewportMaximum = lsitaDate.length - 1
-    if (maxRange)
+    let viewportMaximum = byYear ? Math.ceil(365 / avgValue) : lsitaDate.length - 1
+    if (maxRange && !byYear)
         viewportMaximum = lsitaDate.filter(d => d <= maxRange).length - 1
 
     chart.options.axisX = { viewportMinimum, viewportMaximum }
@@ -90,6 +146,16 @@ let onChangeCheckboxAvg = function () {
     sendEvent('checkbox_avg_click_' + avgType, 'checkbox_avg_click', avgType + ' clicked')
     avgValue = Number(avgType.replace("avg_", ''))
     renderFromList()
+}
+
+function byYearOnChange() {
+    if (document.querySelector("#byYear").checked) {
+        document.querySelector('#allDate').checked = true;
+        [...document.querySelectorAll("input[name=dates")].forEach(e => e.disabled = true)
+    } else {
+        [...document.querySelectorAll("input[name=dates")].forEach(e => e.disabled = false)
+    }
+    changeDateRange()
 }
 
 let giorniData = 0
@@ -261,7 +327,6 @@ let moveSlider = function (e) {
     e.preventDefault()
     let slide = $('#rangeSlider')
     let value = slide.val()
-    console.log(value)
     if (e.originalEvent.wheelDelta < 0)
         slide.val(value - 1)
     else
@@ -335,7 +400,10 @@ let setLocation = function () {
         queryString += "scale=sameScale" + "&"
 
     if (document.querySelector('#rateoAbitanti').checked)
-            queryString += "rateo=rateoAbitanti" + "&"
+        queryString += "rateo=rateoAbitanti" + "&"
+
+    if (document.querySelector('#byYear').checked)
+        queryString += "byYear=byYear" + "&"
 
     $('#shareLink').val(encodeURI(location.origin + location.pathname + queryString))
 }
@@ -354,7 +422,7 @@ let handleQueryParams = function () {
             $('#checkboxDatasets[multiple]').multiselect('select', value)
         } else if (key == 'regione') {
             regioni.push(value)
-        } else if (['avg', 'dates', 'scale', 'rateo'].includes(key)) {
+        } else if (['avg', 'dates', 'scale', 'rateo', 'byYear'].includes(key)) {
             document.getElementById(value).checked = true
         }
     })
@@ -373,6 +441,10 @@ let handleQueryParams = function () {
         regioniSelezionate = regioni
     } else {
         $('#regioni[multiple]').multiselect('select', '')
+    }
+    if (document.querySelector("#byYear").checked) {
+        document.querySelector('#allDate').checked = true;
+        [...document.querySelectorAll("input[name=dates")].forEach(e => e.disabled = true)
     }
     changeDateRange()
     onChangeCheckboxAvg()
@@ -395,21 +467,21 @@ let sharePng = function () {
         let dataurl = document.querySelector("canvas").toDataURL('png')
 
         fetch(dataurl)
-        .then((res) => res.blob())
-        .then((blob) => new File([blob], "covid_italia_chart.png", {type: blob.type}))
-        .then(file => {
-            let filesArray = [file]
-            navigator.share({
-                files: filesArray,
-                title: "covid_italia_chart.png",
-                text: "Covid Italia Chart " + $('#shareLink').val(),
+            .then((res) => res.blob())
+            .then((blob) => new File([blob], "covid_italia_chart.png", { type: blob.type }))
+            .then(file => {
+                let filesArray = [file]
+                navigator.share({
+                    files: filesArray,
+                    title: "covid_italia_chart.png",
+                    text: "Covid Italia Chart " + $('#shareLink').val(),
+                })
+                    .finally(() => {
+                        chart.set("width", originalWidth)
+                        chart.set("height", originalHeight)
+                    })
+                    .catch((error) => console.log('Sharing failed', error))
             })
-            .finally(() => {
-                chart.set("width", originalWidth)
-                chart.set("height", originalHeight)
-            })
-            .catch((error) => console.log('Sharing failed', error))
-        })
     } else {
         alert(`Your system doesn't support sharing files.`)
     }

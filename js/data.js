@@ -168,6 +168,28 @@ let popolateData = function (dati_covid, regione) {
     addToDataset('calcolo_r_t', regione, 'Calcolo Rt', calcolo_r_t, 'https://it.wikipedia.org/wiki/Numero_di_riproduzione_di_base#Numero_di_riproduzione_netto_al_tempo_t', 2)
 }
 
+function getDataByYear(list) {
+    res = {}
+
+    let firstDate = date.avg_1[0]
+    let startDate = new Date(firstDate)
+    startDate.setMonth(0)
+    startDate.setDate(1)
+    res[firstDate.getFullYear()] = new Array(Math.round((firstDate - startDate) / (1000 * 60 * 60 * 24))).fill(0)
+    for (let i in list) {
+        let d = date.avg_1[i]
+        let year = d.getFullYear()
+        if ((((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) && d.getDate() === 28 && d.getMonth() === 1) {
+            continue
+        }
+        if (!res[year])
+            res[year] = []
+        res[year].push(list[i])
+    }
+
+    return res
+}
+
 let addToDataset = function (id, regione, title, list, link, decimal) {
 
     let ds = {
@@ -179,6 +201,23 @@ let addToDataset = function (id, regione, title, list, link, decimal) {
         getRateoAbitanti: (avg, limit) => {
             let ret = listAvg(list, avg, decimal, limit)
             ret = rateoListe(ret, new Array(ret.length).fill(regioni_abitanti[regione]), 100, 4)
+            return ret
+        },
+        getDataByYear: (avg, limit) => {
+            let ret = listAvg(list, 1, decimal, limit)
+            ret = getDataByYear(ret)
+            Object.keys(ret).forEach(key => {
+                ret[key] = listAvg(ret[key], avg, decimal)
+            })
+            return ret
+        },
+        getDataByYearRateoAbitanti: (avg, limit) => {
+            let ret = listAvg(list, 1, decimal, limit)
+            ret = rateoListe(ret, new Array(ret.length).fill(regioni_abitanti[regione]), 100, 4)
+            ret = getDataByYear(ret)
+            Object.keys(ret).forEach(key => {
+                ret[key] = listAvg(ret[key], avg, 4)
+            })
             return ret
         },
     }
