@@ -241,7 +241,14 @@ let popolaVaccini = function (datiVaccini) {
     for (const i in codiciRegioni) {
         let dati = datiVaccini.data
             .filter(d => d.area == codiciRegioni[i])
-            .map(d => { return { data: d.data_somministrazione, prima_dose: d.prima_dose, seconda_dose: d.seconda_dose } })
+            .map(d => {
+                return {
+                    data: d.data_somministrazione, 
+                    prima_dose: d.prima_dose, 
+                    seconda_dose: d.seconda_dose,
+                    dose_addizionale_booster: d.dose_addizionale_booster,
+                } 
+            })
             .sort((a, b) => a.data.localeCompare(b.data))
         let regione = regioni[i]
         datiParsati.push({ regione, dati })
@@ -249,9 +256,15 @@ let popolaVaccini = function (datiVaccini) {
             if (datiItalia.find(di => di.data == d.data)){
                 datiItalia.find(di => di.data == d.data).prima_dose += d.prima_dose
                 datiItalia.find(di => di.data == d.data).seconda_dose += d.seconda_dose
+                datiItalia.find(di => di.data == d.data).dose_addizionale_booster += d.dose_addizionale_booster
             }
             else
-                datiItalia.push({ data: d.data, prima_dose: d.prima_dose, seconda_dose: d.seconda_dose })
+                datiItalia.push({
+                    data: d.data, 
+                    prima_dose: d.prima_dose, 
+                    seconda_dose: d.seconda_dose,
+                    dose_addizionale_booster: d.dose_addizionale_booster,
+                })
         })
     }
     datiItalia = datiItalia.sort((a, b) => a.data.localeCompare(b.data))
@@ -272,6 +285,11 @@ let addVacciniToDataset = function (dati, regione) {
     let totale_vaccini_seconda_dose = giornalieroToTotale(vaccini_seconda_dose)
     addToDataset('vaccini_seconda_dose', regione, 'Vaccini seconda dose', vaccini_seconda_dose)
     addToDataset('totale_vaccini_seconda_dose', regione, 'Totale Vaccini seconda dose', totale_vaccini_seconda_dose)
+
+    let dose_addizionale_booster = normalizeDatiVaccini(dati, 'dose_addizionale_booster')
+    let totale_dose_addizionale_booster = giornalieroToTotale(dose_addizionale_booster)
+    addToDataset('dose_addizionale_booster', regione, 'Vaccini dose addizionale booster', dose_addizionale_booster)
+    addToDataset('totale_dose_addizionale_booster', regione, 'Totale Vaccini dose addizionale booster', totale_dose_addizionale_booster)
 }
 
 let normalizeDatiVaccini = function (dati, dose) {
@@ -281,7 +299,7 @@ let normalizeDatiVaccini = function (dati, dose) {
         if (dati[0] && data == new Date(dati[0].data).toLocaleDateString())
             result.push(dati.shift()[dose])
         else
-            result.push(NaN)
+            result.push(0)
     }
 
     return result
