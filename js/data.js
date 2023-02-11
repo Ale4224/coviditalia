@@ -99,7 +99,7 @@ let popolateDataRegione = function (dati_covid) {
 
 const A = 1.87
 const B = 0.28
-const gammaResults = libR.Gamma().dgamma([...Array(1000).keys()], A, B)
+const gammaResults = libR.Gamma().dgamma([...Array(2000).keys()], A, B)
 let calcoloRT = function (lista_infetti) {
     let result = []
     for (t in lista_infetti) {
